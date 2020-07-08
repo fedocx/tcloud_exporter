@@ -1,0 +1,5 @@
+  tencentcloud_secret_id: YOURID
+  tencentcloud_secret_key: YOURKEY
+  mysql:
+    - yourinstanceid1
+    - yourinstanceid2
