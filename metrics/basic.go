@@ -46,7 +46,12 @@ func FormatMetrics(response *monitor.GetMonitorDataResponse,MetricCollector *Met
 	for _,i := range response.Response.DataPoints {
 
 		instanceid := *i.Dimensions[0].Value
-		value := *i.Values[0]
+		var value float64
+		if len(i.Values) > 0{
+			value = *i.Values[0]
+		}else{
+			continue
+		}
 		data := Data{instanceid,value}
 		datas = append(datas,data)
 	}

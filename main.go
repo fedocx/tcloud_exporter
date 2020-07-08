@@ -77,6 +77,8 @@ func init(){
 func main(){
 	InitConfig()
 	TENCENTCLOUD_SECRET_ID,TENCENTCLOUD_SECRET_KEY = utils.GetAuthInfo()
+
+	//将指标添加到指标库中
 	go func(){
 		for {
 			mysqlmetrics := metrics.GetMysqlMetrics(TENCENTCLOUD_SECRET_ID,TENCENTCLOUD_SECRET_KEY)

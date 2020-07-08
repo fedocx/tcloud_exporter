@@ -39,6 +39,7 @@ func GetMysqlMetrics(id,key string)(*MetricObj){
 	GetMysqlMetric(client,MetricCollector,"MemoryUseRate")
 	GetMysqlMetric(client,MetricCollector,"BytesSent")
 	GetMysqlMetric(client,MetricCollector,"BytesReceived")
+	GetMysqlMetric(client,MetricCollector,"VolumeRate")
 	return MetricCollector
 
 
