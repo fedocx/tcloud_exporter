@@ -2,16 +2,16 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/spf13/viper"
+	"log"
 	"net/http"
 	"os"
+	metriccommon "tcloud_exporter/metriccommon"
 	"tcloud_exporter/metrics"
 	"tcloud_exporter/utils"
 	"time"
-	"log"
 )
 
 var TENCENTCLOUD_SECRET_ID,TENCENTCLOUD_SECRET_KEY string
@@ -36,17 +36,42 @@ var (
 		Help: "Number of blob storage operations waiting to be processed.",
 	},
 	[]string{"instance"})
-	//mysqlMemUseRage = prometheus.NewHistogram(prometheus.HistogramOpts{
-	//	Namespace: "tcloud",
-	//	Subsystem: "blob_storage",
-	//	Name: "memory",
-	//	Help: "Number of blob storage operations waiting to be processed.",
-	//	Buckets: prometheus.ExponentialBuckets(1,5,5),
-	//})
+	mysqlMemUseRage = prometheus.NewGaugeVec(prometheus.GaugeOpts{
+		Namespace: "tcloud",
+		Subsystem: "database_mysql",
+		Name: "mem",
+		Help: "Number of blob storage operations waiting to be processed.",
+	},
+		[]string{"instance"})
+	mysqlDiskUse = prometheus.NewGaugeVec(prometheus.GaugeOpts{
+		Namespace: "tcloud",
+		Subsystem: "database_mysql",
+		Name: "disk",
+		Help: "Number of blob storage operations waiting to be processed.",
+	},
+		[]string{"instance"})
+	mysqlNetIn = prometheus.NewGaugeVec(prometheus.GaugeOpts{
+		Namespace: "tcloud",
+		Subsystem: "database_mysql",
+		Name: "net_in",
+		Help: "Number of blob storage operations waiting to be processed.",
+	},
+		[]string{"instance"})
+	mysqlNetOut = prometheus.NewGaugeVec(prometheus.GaugeOpts{
+		Namespace: "tcloud",
+		Subsystem: "database_mysql",
+		Name: "net_out",
+		Help: "Number of blob storage operations waiting to be processed.",
+	},
+		[]string{"instance"})
 )
 
 func init(){
 	prometheus.MustRegister(mysqlCpuUseRage)
+	prometheus.MustRegister(mysqlMemUseRage)
+	prometheus.MustRegister(mysqlDiskUse)
+	prometheus.MustRegister(mysqlNetIn)
+	prometheus.MustRegister(mysqlNetOut)
 }
 
 func main(){
@@ -54,13 +79,12 @@ func main(){
 	TENCENTCLOUD_SECRET_ID,TENCENTCLOUD_SECRET_KEY = utils.GetAuthInfo()
 	go func(){
 		for {
-			mysqlmetrics := *metrics.GetMysqlMetrics(TENCENTCLOUD_SECRET_ID,TENCENTCLOUD_SECRET_KEY)
-			for _,val := range mysqlmetrics.MetricData["CPUUseRate"]{
-				fmt.Println(val.Key,val.Value)
-				//mysqlCpuUseRage.With(prometheus.Labels{"instance":val.Key})
-				i,_ := mysqlCpuUseRage.GetMetricWithLabelValues(val.Key)
-				i.Set(val.Value)
-			}
+			mysqlmetrics := metrics.GetMysqlMetrics(TENCENTCLOUD_SECRET_ID,TENCENTCLOUD_SECRET_KEY)
+			metriccommon.GetGuage("CPUUseRate",mysqlCpuUseRage,mysqlmetrics)
+			metriccommon.GetGuage("MemoryUseRate",mysqlMemUseRage,mysqlmetrics)
+			metriccommon.GetGuage("VolumeRate",mysqlDiskUse,mysqlmetrics)
+			metriccommon.GetGuage("BytesSent",mysqlNetOut,mysqlmetrics)
+			metriccommon.GetGuage("BytesReceived",mysqlNetIn,mysqlmetrics)
 			time.Sleep(time.Second * 60)
 
 		}
