@@ -14,9 +14,11 @@ package metrics
 
 import (
 	"fmt"
+	"github.com/spf13/viper"
 	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common"
 	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common/regions"
 	monitor "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/monitor/v20180724"
+	"tcloud_exporter/utils"
 )
 
 type Mysql struct {
@@ -24,7 +26,7 @@ type Mysql struct {
 }
 
 
-func GetMysqlMetrics(id,key string,mysqlmetrics []string)(*MetricObj){
+func GetMysqlMetrics(id,key string,resourceconfig *viper.Viper,dataconfig *viper.Viper)(*MetricObj){
 
 	cpf := GetCpf()
     // 认证信息
@@ -36,11 +38,12 @@ func GetMysqlMetrics(id,key string,mysqlmetrics []string)(*MetricObj){
 	MetricCollector.MetricData = Metricdata
 
 	//mysql register
+	mysqlmetrics := utils.GetMysqlMetrics(dataconfig)
 
 	// 获取指标
 	for _,val := range mysqlmetrics{
 		fmt.Println(key,val)
-		GetMysqlMetric(client,MetricCollector,val)
+		GetMysqlMetric(client,MetricCollector,val,resourceconfig)
 	}
 	//GetMysqlMetric(client,MetricCollector,"CPUUseRate")
 	//GetMysqlMetric(client,MetricCollector,"MemoryUseRate")
@@ -50,7 +53,7 @@ func GetMysqlMetrics(id,key string,mysqlmetrics []string)(*MetricObj){
 	return MetricCollector
 }
 
-func GetMysqlMetric(client *monitor.Client,MetricCollector *MetricObj,metrictype string){
+func GetMysqlMetric(client *monitor.Client,MetricCollector *MetricObj,metrictype string,resourceconfig *viper.Viper){
 	GetMetrics(client,MetricCollector,"QCE/CDB",metrictype)
 }
 

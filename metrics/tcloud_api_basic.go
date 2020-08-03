@@ -15,6 +15,7 @@ package metrics
 
 import (
 	"fmt"
+	"github.com/spf13/viper"
 	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common"
 	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common/errors"
 	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common/profile"
@@ -35,7 +36,7 @@ type MetricObj struct{
 	//Data []Data
 }
 
-func GetMetrics(client *monitor.Client,MetricCollector *MetricObj,apinamespace string ,metrictype string){
+func GetMetrics(client *monitor.Client,MetricCollector *MetricObj,apinamespace string ,metrictype string,resourceconfig *viper.Viper){
 	// 创建并设置请求参数
 	request := monitor.NewGetMonitorDataRequest()
 	request.Namespace = common.StringPtr(apinamespace)
@@ -92,8 +93,8 @@ func FormatMetrics(response *monitor.GetMonitorDataResponse,MetricCollector *Met
 	MetricCollector.MetricData[*response.Response.MetricName] =  datas
 }
 
-func AddInstance(request *monitor.GetMonitorDataRequest){
-	mysqllist := utils.GetMysqlInstance()
+func AddInstance(request *monitor.GetMonitorDataRequest,resourceconfig *viper.Viper){
+	mysqllist := utils.GetMysqlInstance(resourceconfig)
 	list_instance := []*monitor.Instance{}
 	for _,str := range mysqllist {
 		list_dimension := []*monitor.Dimension{}
