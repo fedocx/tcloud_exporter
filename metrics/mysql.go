@@ -15,23 +15,14 @@ package metrics
 import (
 	"fmt"
 	"github.com/spf13/viper"
-	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common"
-	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common/regions"
 	monitor "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/monitor/v20180724"
 	"tcloud_exporter/utils"
 )
 
 type Mysql struct {
-
 }
 
-
-func GetMysqlMetrics(id,key string,resourceconfig *viper.Viper,dataconfig *viper.Viper)(*MetricObj){
-
-	cpf := GetCpf()
-    // 认证信息
-	credential := common.NewCredential(id,key)
-	client,_ := monitor.NewClient(credential,regions.Beijing,cpf)
+func GetMysqlMetrics(client *monitor.Client, resourceconfig *viper.Viper, dataconfig *viper.Viper) *MetricObj {
 
 	MetricCollector := new(MetricObj)
 	Metricdata := make(map[string][]Data)
@@ -41,19 +32,13 @@ func GetMysqlMetrics(id,key string,resourceconfig *viper.Viper,dataconfig *viper
 	mysqlmetrics := utils.GetMysqlMetrics(dataconfig)
 
 	// 获取指标
-	for _,val := range mysqlmetrics{
-		fmt.Println(key,val)
-		GetMysqlMetric(client,MetricCollector,val,resourceconfig)
+	for _, val := range mysqlmetrics {
+		fmt.Println(val)
+		GetMysqlMetric(client, MetricCollector, val, resourceconfig)
 	}
-	//GetMysqlMetric(client,MetricCollector,"CPUUseRate")
-	//GetMysqlMetric(client,MetricCollector,"MemoryUseRate")
-	//GetMysqlMetric(client,MetricCollector,"BytesSent")
-	//GetMysqlMetric(client,MetricCollector,"BytesReceived")
-	//GetMysqlMetric(client,MetricCollector,"VolumeRate")
 	return MetricCollector
 }
 
-func GetMysqlMetric(client *monitor.Client,MetricCollector *MetricObj,metrictype string,resourceconfig *viper.Viper){
-	GetMetrics(client,MetricCollector,"QCE/CDB",metrictype)
+func GetMysqlMetric(client *monitor.Client, MetricCollector *MetricObj, metrictype string, resourceconfig *viper.Viper) {
+	GetMetrics(client, MetricCollector, "QCE/CDB", metrictype, resourceconfig)
 }
-

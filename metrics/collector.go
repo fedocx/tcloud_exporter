@@ -14,13 +14,25 @@ package metrics
 import (
 	"fmt"
 	"github.com/spf13/viper"
-	"tcloud_exporter/utils"
+	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common"
+	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common/regions"
+	monitor "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/monitor/v20180724"
 )
 
 // 根据当前配置信息，获取配置里面的数据库项，并根据数据库项获取响应的数据库指标
-func GetDatabaseMetrics(id,key string,resourceconfig *viper.Viper, dataconfig *viper.Viper){
+func GetDatabaseMetrics(id, key string, resourceconfig *viper.Viper, dataconfig *viper.Viper) {
 	objects := dataconfig.AllKeys()
 	fmt.Println(objects)
-	GetMysqlMetrics(id,key,dastaconfig)
+	client := GetClient(id, key)
+	GetMysqlMetrics(client, resourceconfig, dataconfig)
+
+}
+
+func GetClient(id, key string) *monitor.Client {
+	cpf := GetCpf()
+	// 认证信息
+	credential := common.NewCredential(id, key)
+	client, _ := monitor.NewClient(credential, regions.Beijing, cpf)
+	return client
 
 }

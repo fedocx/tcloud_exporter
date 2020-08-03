@@ -1,4 +1,3 @@
-
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -24,19 +23,19 @@ import (
 )
 
 // struct for collector
-type Data struct{
-	Key string
+type Data struct {
+	Key   string
 	Value float64
 }
 
 // struct for collector
-type MetricObj struct{
+type MetricObj struct {
 	MetricData map[string][]Data
 	//MetricName string
 	//Data []Data
 }
 
-func GetMetrics(client *monitor.Client,MetricCollector *MetricObj,apinamespace string ,metrictype string,resourceconfig *viper.Viper){
+func GetMetrics(client *monitor.Client, MetricCollector *MetricObj, apinamespace string, metrictype string, resourceconfig *viper.Viper) {
 	// 创建并设置请求参数
 	request := monitor.NewGetMonitorDataRequest()
 	request.Namespace = common.StringPtr(apinamespace)
@@ -44,18 +43,18 @@ func GetMetrics(client *monitor.Client,MetricCollector *MetricObj,apinamespace s
 	//设置采集时间
 	utils.SetTimeRange(request)
 	// instance 设置
-	AddInstance(request)
+	AddInstance(request, resourceconfig)
 	// 发起请求
-	response,err := client.GetMonitorData(request)
+	response, err := client.GetMonitorData(request)
 	// 异常处理
-	if _,ok := err.(*errors.TencentCloudSDKError); ok {
+	if _, ok := err.(*errors.TencentCloudSDKError); ok {
 		fmt.Printf("An API error has returned : %s", err)
 		return
 	}
 	if err != nil {
 		panic(err)
 	}
-	FormatMetrics(response,MetricCollector)
+	FormatMetrics(response, MetricCollector)
 }
 
 func GetCpf() *profile.ClientProfile {
@@ -75,36 +74,34 @@ func GetCpf() *profile.ClientProfile {
 
 }
 
-func FormatMetrics(response *monitor.GetMonitorDataResponse,MetricCollector *MetricObj){
+func FormatMetrics(response *monitor.GetMonitorDataResponse, MetricCollector *MetricObj) {
 	//metrics := make(map[string]float64)
-	datas := make([]Data,0)
-	for _,i := range response.Response.DataPoints {
+	datas := make([]Data, 0)
+	for _, i := range response.Response.DataPoints {
 
 		instanceid := *i.Dimensions[0].Value
 		var value float64
-		if len(i.Values) > 0{
+		if len(i.Values) > 0 {
 			value = *i.Values[0]
-		}else{
+		} else {
 			continue
 		}
-		data := Data{instanceid,value}
-		datas = append(datas,data)
+		data := Data{instanceid, value}
+		datas = append(datas, data)
 	}
-	MetricCollector.MetricData[*response.Response.MetricName] =  datas
+	MetricCollector.MetricData[*response.Response.MetricName] = datas
 }
 
-func AddInstance(request *monitor.GetMonitorDataRequest,resourceconfig *viper.Viper){
+func AddInstance(request *monitor.GetMonitorDataRequest, resourceconfig *viper.Viper) {
 	mysqllist := utils.GetMysqlInstance(resourceconfig)
 	list_instance := []*monitor.Instance{}
-	for _,str := range mysqllist {
+	for _, str := range mysqllist {
 		list_dimension := []*monitor.Dimension{}
-		dimension := &monitor.Dimension{common.StringPtr("InstanceId"),common.StringPtr(str)}
-		list_dimension = append(list_dimension,dimension)
+		dimension := &monitor.Dimension{common.StringPtr("InstanceId"), common.StringPtr(str)}
+		list_dimension = append(list_dimension, dimension)
 		instance := &monitor.Instance{list_dimension}
-		list_instance = append(list_instance,instance)
+		list_instance = append(list_instance, instance)
 
 	}
 	request.Instances = list_instance
 }
-
-
