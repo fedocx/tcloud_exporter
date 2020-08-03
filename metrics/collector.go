@@ -20,12 +20,17 @@ import (
 )
 
 // 根据当前配置信息，获取配置里面的数据库项，并根据数据库项获取响应的数据库指标
-func GetDatabaseMetrics(id, key string, resourceconfig *viper.Viper, dataconfig *viper.Viper) {
+func GetResourceList(id, key string, resourceconfig *viper.Viper, dataconfig *viper.Viper) {
 	objects := dataconfig.AllKeys()
-	fmt.Println(objects)
+	for _, val := range objects {
+		data := dataconfig.GetStringSlice(val)
+		fmt.Println(data)
+	}
+}
+
+func GetResourceMetric(id, key string, resourceconfig *viper.Viper, dataconfig *viper.Viper) {
 	client := GetClient(id, key)
 	GetMysqlMetrics(client, resourceconfig, dataconfig)
-
 }
 
 func GetClient(id, key string) *monitor.Client {

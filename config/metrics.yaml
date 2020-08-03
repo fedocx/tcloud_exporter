@@ -4,3 +4,6 @@ mysql:
   - BytesSent
   - BytesReceived
   - VolumeRate
+mongodb:
+  - a
+  - b

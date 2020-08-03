@@ -20,9 +20,10 @@ import (
 	"tcloud_exporter/utils"
 )
 
-var TENCENTCLOUD_SECRET_ID,TENCENTCLOUD_SECRET_KEY string
-func InitConfig()(resourceconfig,dataconfig *viper.Viper){
-	workDir,_ := os.Getwd()
+var TENCENTCLOUD_SECRET_ID, TENCENTCLOUD_SECRET_KEY string
+
+func InitConfig() (resourceconfig, dataconfig *viper.Viper) {
+	workDir, _ := os.Getwd()
 
 	resourceconfig = viper.New()
 	resourceconfig.SetConfigName("tencent")
@@ -41,20 +42,19 @@ func InitConfig()(resourceconfig,dataconfig *viper.Viper){
 	if err != nil {
 		panic(err)
 	}
-	return resourceconfig,dataconfig
+	return resourceconfig, dataconfig
 }
 
-var addr = flag.String("listen-addr",":8081","the port to listen on for HTTP requests")
+var addr = flag.String("listen-addr", ":8081", "the port to listen on for HTTP requests")
 
-func main(){
+func main() {
 
-	resourceconfig,dataconfig := InitConfig()
-	TENCENTCLOUD_SECRET_ID,TENCENTCLOUD_SECRET_KEY = utils.GetAuthInfo(resourceconfig)
+	resourceconfig, dataconfig := InitConfig()
+	TENCENTCLOUD_SECRET_ID, TENCENTCLOUD_SECRET_KEY = utils.GetAuthInfo(resourceconfig)
 	mysqlmetrics := utils.GetMysqlMetrics(dataconfig)
 	fmt.Println(mysqlmetrics)
 
-
-	metrics.GetDatabaseMetrics(TENCENTCLOUD_SECRET_ID,TENCENTCLOUD_SECRET_KEY,resourceconfig,dataconfig)
+	metrics.GetResourceList(TENCENTCLOUD_SECRET_ID, TENCENTCLOUD_SECRET_KEY, resourceconfig, dataconfig)
 
 	// 首先调用各个数据库的采集接口，获取到采集指标。
 	// 其次在采集接口中通过注册的方式控制获取哪些指标，比如disk或者net的指标
@@ -81,4 +81,3 @@ func main(){
 	//log.Fatal(http.ListenAndServe(*addr,nil))
 
 }
-
