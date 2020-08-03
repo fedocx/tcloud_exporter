@@ -9,7 +9,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-package metriccommon
+package collector
 
 import (
 	"github.com/prometheus/client_golang/prometheus"
@@ -21,5 +21,4 @@ func GetGuage(metricname string,gaugevec *prometheus.GaugeVec,metrics *metrics.M
 		i,_ := gaugevec.GetMetricWithLabelValues(val.Key)
 		i.Set(val.Value)
 	}
-
 }

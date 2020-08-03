@@ -13,91 +13,65 @@ package main
 
 import (
 	"flag"
-	"github.com/prometheus/client_golang/prometheus"
+	"fmt"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"github.com/spf13/viper"
-	"log"
 	"net/http"
-	"os"
-	metriccommon "tcloud_exporter/metriccommon"
+	"tcloud_exporter/collector"
 	"tcloud_exporter/metrics"
-	"tcloud_exporter/utils"
 	"time"
+
+	"github.com/spf13/viper"
+	"os"
+	"tcloud_exporter/utils"
 )
 
 var TENCENTCLOUD_SECRET_ID,TENCENTCLOUD_SECRET_KEY string
-func InitConfig(){
+func InitConfig()(resourceconfig,dataconfig *viper.Viper){
 	workDir,_ := os.Getwd()
-	viper.SetConfigName("tencent")
-	viper.SetConfigType("yml")
-	viper.AddConfigPath(workDir + "/config")
-	err := viper.ReadInConfig()
+
+	resourceconfig = viper.New()
+	resourceconfig.SetConfigName("tencent")
+	resourceconfig.SetConfigType("yml")
+	resourceconfig.AddConfigPath(workDir + "/config")
+	err := resourceconfig.ReadInConfig()
 	if err != nil {
 		panic(err)
 	}
+
+	dataconfig = viper.New()
+	dataconfig.SetConfigName("metrics")
+	dataconfig.SetConfigType("yml")
+	dataconfig.AddConfigPath(workDir + "/config")
+	err = dataconfig.ReadInConfig()
+	if err != nil {
+		panic(err)
+	}
+	return resourceconfig,dataconfig
 }
 
 var addr = flag.String("listen-addr",":8081","the port to listen on for HTTP requests")
 
-var (
-	mysqlCpuUseRage = prometheus.NewGaugeVec(prometheus.GaugeOpts{
-		Namespace: "tcloud",
-		Subsystem: "database_mysql",
-		Name: "cpu",
-		Help: "Number of blob storage operations waiting to be processed.",
-	},
-	[]string{"instance"})
-	mysqlMemUseRage = prometheus.NewGaugeVec(prometheus.GaugeOpts{
-		Namespace: "tcloud",
-		Subsystem: "database_mysql",
-		Name: "mem",
-		Help: "Number of blob storage operations waiting to be processed.",
-	},
-		[]string{"instance"})
-	mysqlDiskUse = prometheus.NewGaugeVec(prometheus.GaugeOpts{
-		Namespace: "tcloud",
-		Subsystem: "database_mysql",
-		Name: "disk",
-		Help: "Number of blob storage operations waiting to be processed.",
-	},
-		[]string{"instance"})
-	mysqlNetIn = prometheus.NewGaugeVec(prometheus.GaugeOpts{
-		Namespace: "tcloud",
-		Subsystem: "database_mysql",
-		Name: "net_in",
-		Help: "Number of blob storage operations waiting to be processed.",
-	},
-		[]string{"instance"})
-	mysqlNetOut = prometheus.NewGaugeVec(prometheus.GaugeOpts{
-		Namespace: "tcloud",
-		Subsystem: "database_mysql",
-		Name: "net_out",
-		Help: "Number of blob storage operations waiting to be processed.",
-	},
-		[]string{"instance"})
-)
-
-func init(){
-	prometheus.MustRegister(mysqlCpuUseRage)
-	prometheus.MustRegister(mysqlMemUseRage)
-	prometheus.MustRegister(mysqlDiskUse)
-	prometheus.MustRegister(mysqlNetIn)
-	prometheus.MustRegister(mysqlNetOut)
-}
-
 func main(){
-	InitConfig()
-	TENCENTCLOUD_SECRET_ID,TENCENTCLOUD_SECRET_KEY = utils.GetAuthInfo()
 
-	//将指标添加到指标库中
+	resourceconfig,dataconfig := InitConfig()
+	TENCENTCLOUD_SECRET_ID,TENCENTCLOUD_SECRET_KEY = utils.GetAuthInfo(resourceconfig)
+	mysqlmetrics := utils.GetMysqlMetrics(dataconfig)
+
+	// 首先调用各个数据库的采集接口，获取到采集指标。
+	// 其次在采集接口中通过注册的方式控制获取哪些指标，比如disk或者net的指标
+	// 将获取到的指标放入到collector中，api接口通过gorouting方式执行，定时按照特定频率更新指标信息到collector中
+	// collector消费端通过gorouting方式从collector中获取指标信息，完成对collecotor的消费工作。
+
+	//将指标添加到指标库中,针对gauge类型的指标
 	go func(){
 		for {
-			mysqlmetrics := metrics.GetMysqlMetrics(TENCENTCLOUD_SECRET_ID,TENCENTCLOUD_SECRET_KEY)
-			metriccommon.GetGuage("CPUUseRate",mysqlCpuUseRage,mysqlmetrics)
-			metriccommon.GetGuage("MemoryUseRate",mysqlMemUseRage,mysqlmetrics)
-			metriccommon.GetGuage("VolumeRate",mysqlDiskUse,mysqlmetrics)
-			metriccommon.GetGuage("BytesSent",mysqlNetOut,mysqlmetrics)
-			metriccommon.GetGuage("BytesReceived",mysqlNetIn,mysqlmetrics)
+			// 通过调用腾讯云接口，按照指定频率获取监控指标，生产指标
+			mysqlmetrics := metrics.GetMysqlMetrics(TENCENTCLOUD_SECRET_ID,TENCENTCLOUD_SECRET_KEY,mysqlmetrics)
+
+			// 通过获取的指标，存放在mysqlmetrics 变量中，并将指标传递给指标消费函数，该函数获取对应的值，在Prometheus中进行展示
+			collector.MetricsConsumer(mysqlmetrics)
+
+			// 每隔1分钟获取一次指标
 			time.Sleep(time.Second * 60)
 
 		}
@@ -108,3 +82,4 @@ func main(){
 	log.Fatal(http.ListenAndServe(*addr,nil))
 
 }
+

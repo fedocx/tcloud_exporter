@@ -2,13 +2,18 @@ package utils
 
 import "github.com/spf13/viper"
 
-func GetAuthInfo()(string,string){
-	TENCENTCLOUD_SECRET_ID := viper.GetString("tencentcloud_secret_id")
-	TENCENTCLOUD_SECRET_KEY := viper.GetString("tencentcloud_secret_key")
+func GetAuthInfo(resourceconfig *viper.Viper)(string,string){
+	TENCENTCLOUD_SECRET_ID := resourceconfig.GetString("tencentcloud_secret_id")
+	TENCENTCLOUD_SECRET_KEY := resourceconfig.GetString("tencentcloud_secret_key")
 	return TENCENTCLOUD_SECRET_ID,TENCENTCLOUD_SECRET_KEY
 }
 
-func GetMysqlInstance()[]string{
-	mysql := viper.GetStringSlice("mysql")
+func GetMysqlInstance(resourceconfig *viper.Viper)[]string{
+	mysql := resourceconfig.GetStringSlice("mysql")
 	return  mysql
+}
+
+func GetMysqlMetrics(dataconfig *viper.Viper)[]string{
+	mysql := dataconfig.GetStringSlice("mysql")
+	return mysql
 }

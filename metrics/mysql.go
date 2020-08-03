@@ -9,9 +9,11 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 package metrics
 
 import (
+	"fmt"
 	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common"
 	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common/regions"
 	monitor "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/monitor/v20180724"
@@ -22,7 +24,7 @@ type Mysql struct {
 }
 
 
-func GetMysqlMetrics(id,key string)(*MetricObj){
+func GetMysqlMetrics(id,key string,mysqlmetrics []string)(*MetricObj){
 
 	cpf := GetCpf()
     // 认证信息
@@ -33,12 +35,18 @@ func GetMysqlMetrics(id,key string)(*MetricObj){
 	Metricdata := make(map[string][]Data)
 	MetricCollector.MetricData = Metricdata
 
+	//mysql register
+
 	// 获取指标
-	GetMysqlMetric(client,MetricCollector,"CPUUseRate")
-	GetMysqlMetric(client,MetricCollector,"MemoryUseRate")
-	GetMysqlMetric(client,MetricCollector,"BytesSent")
-	GetMysqlMetric(client,MetricCollector,"BytesReceived")
-	GetMysqlMetric(client,MetricCollector,"VolumeRate")
+	for _,val := range mysqlmetrics{
+		fmt.Println(key,val)
+		GetMysqlMetric(client,MetricCollector,val)
+	}
+	//GetMysqlMetric(client,MetricCollector,"CPUUseRate")
+	//GetMysqlMetric(client,MetricCollector,"MemoryUseRate")
+	//GetMysqlMetric(client,MetricCollector,"BytesSent")
+	//GetMysqlMetric(client,MetricCollector,"BytesReceived")
+	//GetMysqlMetric(client,MetricCollector,"VolumeRate")
 	return MetricCollector
 }
 

@@ -10,6 +10,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+// file for set tencent api parameters
 package metrics
 
 import (
@@ -21,16 +22,18 @@ import (
 	"tcloud_exporter/utils"
 )
 
+// struct for collector
 type Data struct{
 	Key string
 	Value float64
 }
+
+// struct for collector
 type MetricObj struct{
 	MetricData map[string][]Data
 	//MetricName string
 	//Data []Data
 }
-
 
 func GetMetrics(client *monitor.Client,MetricCollector *MetricObj,apinamespace string ,metrictype string){
 	// 创建并设置请求参数
@@ -104,11 +107,3 @@ func AddInstance(request *monitor.GetMonitorDataRequest){
 }
 
 
-func Productor(chan metric_queue){
-	metric_queue <- 10
-}
-
-func Consumer(){
-	out <- metric_queue
-
-}

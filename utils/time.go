@@ -7,7 +7,7 @@ import (
 )
 
 func SetTimeRange(request *monitor.GetMonitorDataRequest){
-	//request.StartTime = metriccommon.StringPtr(time.Now().Add(time.Duration(-1)*time.Minute).Format(time.RFC3339))
+	//request.StartTime = collector.StringPtr(time.Now().Add(time.Duration(-1)*time.Minute).Format(time.RFC3339))
 	request.EndTime = common.StringPtr(time.Now().Format(time.RFC3339))
 	request.StartTime = common.StringPtr(time.Now().Format(time.RFC3339))
 }

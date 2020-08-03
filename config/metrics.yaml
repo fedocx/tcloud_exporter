@@ -1,0 +1,6 @@
+mysql:
+  - CPUUseRate
+  - MemoryUseRate
+  - BytesSent
+  - BytesReceived
+  - VolumeRate
