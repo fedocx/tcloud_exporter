@@ -13,11 +13,11 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"github.com/spf13/viper"
 	"os"
 	"tcloud_exporter/metrics"
 	"tcloud_exporter/utils"
+	"time"
 )
 
 var TENCENTCLOUD_SECRET_ID, TENCENTCLOUD_SECRET_KEY string
@@ -47,14 +47,19 @@ func InitConfig() (resourceconfig, dataconfig *viper.Viper) {
 
 var addr = flag.String("listen-addr", ":8081", "the port to listen on for HTTP requests")
 
+
 func main() {
 
 	resourceconfig, dataconfig := InitConfig()
 	TENCENTCLOUD_SECRET_ID, TENCENTCLOUD_SECRET_KEY = utils.GetAuthInfo(resourceconfig)
-	mysqlmetrics := utils.GetMysqlMetrics(dataconfig)
-	fmt.Println(mysqlmetrics)
 
-	metrics.GetResourceList(TENCENTCLOUD_SECRET_ID, TENCENTCLOUD_SECRET_KEY, resourceconfig, dataconfig)
+	// 生成channel，用于对指标进行消费
+	var metric_channel = make(chan metrics.MetricChannel,10)
+
+
+	go metrics.GetResourceList(resourceconfig,dataconfig, metric_channel)
+	go metrics.Dispatch(TENCENTCLOUD_SECRET_ID, TENCENTCLOUD_SECRET_KEY,  metric_channel)
+
 
 	// 首先调用各个数据库的采集接口，获取到采集指标。
 	// 其次在采集接口中通过注册的方式控制获取哪些指标，比如disk或者net的指标
@@ -79,5 +84,6 @@ func main() {
 	//flag.Parse()
 	//http.Handle("/metrics",promhttp.Handler())
 	//log.Fatal(http.ListenAndServe(*addr,nil))
+	time.Sleep(time.Minute * 2)
 
 }

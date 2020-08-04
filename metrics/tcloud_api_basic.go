@@ -14,10 +14,10 @@ package metrics
 
 import (
 	"fmt"
-	"github.com/spf13/viper"
 	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common"
 	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common/errors"
 	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common/profile"
+	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common/regions"
 	monitor "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/monitor/v20180724"
 	"tcloud_exporter/utils"
 )
@@ -35,7 +35,13 @@ type MetricObj struct {
 	//Data []Data
 }
 
-func GetMetrics(client *monitor.Client, MetricCollector *MetricObj, apinamespace string, metrictype string, resourceconfig *viper.Viper) {
+
+func GetMetrics(client *monitor.Client, MetricCollector *MetricObj, value_temp MetricChannel) {
+	//参数初始化
+	apinamespace := value_temp.Apinamespace
+	metrictype := value_temp.MetricType
+	instancelist := value_temp.InstanceList
+	instancename := value_temp.InstanceName
 	// 创建并设置请求参数
 	request := monitor.NewGetMonitorDataRequest()
 	request.Namespace = common.StringPtr(apinamespace)
@@ -43,7 +49,11 @@ func GetMetrics(client *monitor.Client, MetricCollector *MetricObj, apinamespace
 	//设置采集时间
 	utils.SetTimeRange(request)
 	// instance 设置
-	AddInstance(request, resourceconfig)
+
+	// print request delete
+	fmt.Println(apinamespace,metrictype,instancelist)
+
+	AddInstance(request, instancelist,instancename)
 	// 发起请求
 	response, err := client.GetMonitorData(request)
 	// 异常处理
@@ -90,18 +100,29 @@ func FormatMetrics(response *monitor.GetMonitorDataResponse, MetricCollector *Me
 		datas = append(datas, data)
 	}
 	MetricCollector.MetricData[*response.Response.MetricName] = datas
+	fmt.Println(MetricCollector.MetricData)
 }
 
-func AddInstance(request *monitor.GetMonitorDataRequest, resourceconfig *viper.Viper) {
-	mysqllist := utils.GetMysqlInstance(resourceconfig)
+func AddInstance(request *monitor.GetMonitorDataRequest, instancelist []string, instancename string) {
+	//mysqllist := utils.GetMysqlInstance(resourceconfig)
 	list_instance := []*monitor.Instance{}
-	for _, str := range mysqllist {
+	for _, str := range instancelist {
 		list_dimension := []*monitor.Dimension{}
-		dimension := &monitor.Dimension{common.StringPtr("InstanceId"), common.StringPtr(str)}
+		dimension := &monitor.Dimension{common.StringPtr(instancename), common.StringPtr(str)}
 		list_dimension = append(list_dimension, dimension)
 		instance := &monitor.Instance{list_dimension}
 		list_instance = append(list_instance, instance)
 
 	}
 	request.Instances = list_instance
+}
+
+// 通过id，key生成客户端
+func GetClient(id, key string) *monitor.Client {
+	cpf := GetCpf()
+	// 认证信息
+	credential := common.NewCredential(id, key)
+	client, _ := monitor.NewClient(credential, regions.Beijing, cpf)
+	return client
+
 }

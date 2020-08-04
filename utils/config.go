@@ -13,7 +13,16 @@ func GetMysqlInstance(resourceconfig *viper.Viper)[]string{
 	return  mysql
 }
 
+func GetMongoInstance(resourceconfig *viper.Viper)[]string{
+	mongo := resourceconfig.GetStringSlice("mongodb")
+	return  mongo
+}
 func GetMysqlMetrics(dataconfig *viper.Viper)[]string{
 	mysql := dataconfig.GetStringSlice("mysql")
 	return mysql
+}
+
+func GetMongoMetrics(dataconfig *viper.Viper)[]string{
+	mongo := dataconfig.GetStringSlice("mongodb")
+	return mongo
 }

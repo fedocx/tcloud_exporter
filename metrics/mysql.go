@@ -12,33 +12,31 @@
 
 package metrics
 
-import (
-	"fmt"
-	"github.com/spf13/viper"
-	monitor "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/monitor/v20180724"
-	"tcloud_exporter/utils"
-)
-
 type Mysql struct {
 }
 
-func GetMysqlMetrics(client *monitor.Client, resourceconfig *viper.Viper, dataconfig *viper.Viper) *MetricObj {
+//func GetMysqlMetrics(client *monitor.Client,MetricCollector *MetricObj, resourceconfig *viper.Viper, dataconfig *viper.Viper) *MetricObj {
+//
+//
+//	//mysql register
+//	mysqlmetrics := utils.GetMysqlMetrics(dataconfig)
+//
+//	// 获取指标
+//	for _, val := range mysqlmetrics {
+//		fmt.Println(val)
+//		GetMysqlMetric(client, MetricCollector, val, resourceconfig)
+//	}
+//	return MetricCollector
+//}
 
-	MetricCollector := new(MetricObj)
-	Metricdata := make(map[string][]Data)
-	MetricCollector.MetricData = Metricdata
+//func GetMysqlMetric(client *monitor.Client, MetricCollector *MetricObj, metrictype string, resourceconfig *viper.Viper) {
+//	GetMetrics(client, MetricCollector, "QCE/CDB", metrictype, resourceconfig)
+//}
 
-	//mysql register
-	mysqlmetrics := utils.GetMysqlMetrics(dataconfig)
-
-	// 获取指标
-	for _, val := range mysqlmetrics {
-		fmt.Println(val)
-		GetMysqlMetric(client, MetricCollector, val, resourceconfig)
-	}
-	return MetricCollector
+func GetMysqlCode()string{
+	return "QCE/CDB"
 }
 
-func GetMysqlMetric(client *monitor.Client, MetricCollector *MetricObj, metrictype string, resourceconfig *viper.Viper) {
-	GetMetrics(client, MetricCollector, "QCE/CDB", metrictype, resourceconfig)
-}
+//func SendMysqlMetric(client *monitor.Client, MetricCollector *MetricObj, metrictype string, resourceconfig *viper.Viper){
+//
+//}

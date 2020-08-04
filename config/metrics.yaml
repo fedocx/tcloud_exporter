@@ -1,9 +1,12 @@
-mysql:
-  - CPUUseRate
-  - MemoryUseRate
-  - BytesSent
-  - BytesReceived
-  - VolumeRate
+#mysql:
+#  - CPUUseRate
+#  - MemoryUseRate
+#  - BytesSent
+#  - BytesReceived
+#  - VolumeRate
 mongodb:
-  - a
-  - b
+  - Netin
+  - Netout
+  - Conn
+  - Cpuusage
+  - Memusage

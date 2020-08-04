@@ -14,30 +14,68 @@ package metrics
 import (
 	"fmt"
 	"github.com/spf13/viper"
-	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common"
-	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common/regions"
-	monitor "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/monitor/v20180724"
+	"tcloud_exporter/utils"
+	"time"
 )
 
-// 根据当前配置信息，获取配置里面的数据库项，并根据数据库项获取响应的数据库指标
-func GetResourceList(id, key string, resourceconfig *viper.Viper, dataconfig *viper.Viper) {
+type MetricChannel struct{
+	Apinamespace string
+	MetricType string
+	InstanceList []string
+	InstanceName string
+}
+
+// 根据当前配置信息，获取配置里面的数据库项，并根据数据库项获取响应的数据库指标,通过goroutin方式执行
+func GetResourceList(resourceconfig *viper.Viper, dataconfig *viper.Viper,metric_chan chan MetricChannel) {
+
+	// 获取配置文件采集项
 	objects := dataconfig.AllKeys()
 	for _, val := range objects {
-		data := dataconfig.GetStringSlice(val)
-		fmt.Println(data)
+		switch val{
+		case "mysql":
+			fmt.Println("mysql------------")
+			instancelist := utils.GetMysqlInstance(resourceconfig)
+			data := utils.GetMysqlMetrics(dataconfig)
+			for _,mysqlmetric := range data{
+				code := GetMysqlCode()
+				metric_chan <- MetricChannel{Apinamespace: code,MetricType: mysqlmetric,InstanceList: instancelist,InstanceName: "InstanceId"}
+
+			}
+		case "mongodb":
+			fmt.Println("mongo------------")
+			instancelist := utils.GetMongoInstance(resourceconfig)
+			data := utils.GetMongoMetrics(dataconfig)
+			for _,mongometric := range data{
+				code := GetMongoCode()
+				metric_chan <- MetricChannel{Apinamespace: code,MetricType: mongometric,InstanceList: instancelist,InstanceName: "target"}
+			}
+		}
 	}
 }
 
-func GetResourceMetric(id, key string, resourceconfig *viper.Viper, dataconfig *viper.Viper) {
-	client := GetClient(id, key)
-	GetMysqlMetrics(client, resourceconfig, dataconfig)
-}
 
-func GetClient(id, key string) *monitor.Client {
-	cpf := GetCpf()
-	// 认证信息
-	credential := common.NewCredential(id, key)
-	client, _ := monitor.NewClient(credential, regions.Beijing, cpf)
-	return client
 
+// 调度器，用于控制腾讯云接口访问频率
+func Dispatch(id, key string, metric_chan chan MetricChannel){
+	// 定义collector 并通过collector来采集数据
+	MetricCollector := new(MetricObj)
+	Metricdata := make(map[string][]Data)
+	MetricCollector.MetricData = Metricdata
+
+	// 获取client
+	client := GetClient(id,key)
+	for {
+		//value_temp := <- metric_chan
+		GetMetrics(client,MetricCollector,<- metric_chan)
+		GetMetrics(client,MetricCollector,<- metric_chan)
+		GetMetrics(client,MetricCollector,<- metric_chan)
+		GetMetrics(client,MetricCollector,<- metric_chan)
+		GetMetrics(client,MetricCollector,<- metric_chan)
+		GetMetrics(client,MetricCollector,<- metric_chan)
+		GetMetrics(client,MetricCollector,<- metric_chan)
+		GetMetrics(client,MetricCollector,<- metric_chan)
+		GetMetrics(client,MetricCollector,<- metric_chan)
+		GetMetrics(client,MetricCollector,<- metric_chan)
+		time.Sleep(time.Second * 1)
+	}
 }
