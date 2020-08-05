@@ -46,6 +46,7 @@ func GetMetrics(client *monitor.Client, MetricCollector *MetricObj, value_temp M
 	request := monitor.NewGetMonitorDataRequest()
 	request.Namespace = common.StringPtr(apinamespace)
 	request.MetricName = common.StringPtr(metrictype)
+	request.Period = common.Uint64Ptr(300)
 	//设置采集时间
 	utils.SetTimeRange(request)
 	// instance 设置
@@ -67,6 +68,7 @@ func GetMetrics(client *monitor.Client, MetricCollector *MetricObj, value_temp M
 	FormatMetrics(response, MetricCollector)
 }
 
+// 客户端配置对象
 func GetCpf() *profile.ClientProfile {
 	// 非必要步骤
 	// 实例化一个客户端配置对象，可以指定超时时间等配置
@@ -116,6 +118,7 @@ func AddInstance(request *monitor.GetMonitorDataRequest, instancelist []string, 
 	}
 	request.Instances = list_instance
 }
+
 
 // 通过id，key生成客户端
 func GetClient(id, key string) *monitor.Client {

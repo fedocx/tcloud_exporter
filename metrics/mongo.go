@@ -13,4 +13,9 @@ package metrics
 
 func GetMongoCode()string{
 	return "QCE/CMONGO"
+	//return "qce/cmongo"
+}
+
+func GetMongoInstancename()string{
+	return "target"
 }

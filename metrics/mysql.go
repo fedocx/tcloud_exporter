@@ -40,3 +40,6 @@ func GetMysqlCode()string{
 //func SendMysqlMetric(client *monitor.Client, MetricCollector *MetricObj, metrictype string, resourceconfig *viper.Viper){
 //
 //}
+func GetMysqlInstancename()string{
+	return "InstanceId"
+}

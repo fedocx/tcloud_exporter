@@ -7,6 +7,3 @@
 mongodb:
   - Netin
   - Netout
-  - Conn
-  - Cpuusage
-  - Memusage

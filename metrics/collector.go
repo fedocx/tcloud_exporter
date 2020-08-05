@@ -38,7 +38,8 @@ func GetResourceList(resourceconfig *viper.Viper, dataconfig *viper.Viper,metric
 			data := utils.GetMysqlMetrics(dataconfig)
 			for _,mysqlmetric := range data{
 				code := GetMysqlCode()
-				metric_chan <- MetricChannel{Apinamespace: code,MetricType: mysqlmetric,InstanceList: instancelist,InstanceName: "InstanceId"}
+				instancename := GetMysqlInstancename()
+				metric_chan <- MetricChannel{Apinamespace: code,MetricType: mysqlmetric,InstanceList: instancelist,InstanceName: instancename}
 
 			}
 		case "mongodb":
@@ -47,7 +48,8 @@ func GetResourceList(resourceconfig *viper.Viper, dataconfig *viper.Viper,metric
 			data := utils.GetMongoMetrics(dataconfig)
 			for _,mongometric := range data{
 				code := GetMongoCode()
-				metric_chan <- MetricChannel{Apinamespace: code,MetricType: mongometric,InstanceList: instancelist,InstanceName: "target"}
+				instancename := GetMongoInstancename()
+				metric_chan <- MetricChannel{Apinamespace: code,MetricType: mongometric,InstanceList: instancelist,InstanceName: instancename}
 			}
 		}
 	}
@@ -66,16 +68,9 @@ func Dispatch(id, key string, metric_chan chan MetricChannel){
 	client := GetClient(id,key)
 	for {
 		//value_temp := <- metric_chan
-		GetMetrics(client,MetricCollector,<- metric_chan)
-		GetMetrics(client,MetricCollector,<- metric_chan)
-		GetMetrics(client,MetricCollector,<- metric_chan)
-		GetMetrics(client,MetricCollector,<- metric_chan)
-		GetMetrics(client,MetricCollector,<- metric_chan)
-		GetMetrics(client,MetricCollector,<- metric_chan)
-		GetMetrics(client,MetricCollector,<- metric_chan)
-		GetMetrics(client,MetricCollector,<- metric_chan)
-		GetMetrics(client,MetricCollector,<- metric_chan)
-		GetMetrics(client,MetricCollector,<- metric_chan)
+		for i:=0;i<=10;i++{
+			GetMetrics(client,MetricCollector,<- metric_chan)
+		}
 		time.Sleep(time.Second * 1)
 	}
 }
