@@ -28,9 +28,14 @@ type Data struct {
 	Value float64
 }
 
+type Product struct{
+	Metrics map[string][]Data
+}
+
+
 // struct for collector
 type MetricObj struct {
-	MetricData map[string][]Data
+	Products  map[string][]*Product
 	//MetricName string
 	//Data []Data
 }
@@ -65,7 +70,7 @@ func GetMetrics(client *monitor.Client, MetricCollector *MetricObj, value_temp M
 	if err != nil {
 		panic(err)
 	}
-	FormatMetrics(response, MetricCollector)
+	FormatMetrics(apinamespace,response, MetricCollector)
 }
 
 // 客户端配置对象
@@ -86,7 +91,7 @@ func GetCpf() *profile.ClientProfile {
 
 }
 
-func FormatMetrics(response *monitor.GetMonitorDataResponse, MetricCollector *MetricObj) {
+func FormatMetrics(productname string,response *monitor.GetMonitorDataResponse, MetricCollector *MetricObj) {
 	//metrics := make(map[string]float64)
 	datas := make([]Data, 0)
 	for _, i := range response.Response.DataPoints {
@@ -101,8 +106,11 @@ func FormatMetrics(response *monitor.GetMonitorDataResponse, MetricCollector *Me
 		data := Data{instanceid, value}
 		datas = append(datas, data)
 	}
-	MetricCollector.MetricData[*response.Response.MetricName] = datas
-	fmt.Println(MetricCollector.MetricData)
+	metrics := new(Product)
+	metrics.Metrics[*response.Response.MetricName] = datas
+	MetricCollector.Products[productname] = append(MetricCollector.Products[productname],metrics)
+	//MetricCollector.Products[productname].[*response.Response.MetricName] = datas
+	fmt.Println(MetricCollector.Products)
 }
 
 func AddInstance(request *monitor.GetMonitorDataRequest, instancelist []string, instancename string) {

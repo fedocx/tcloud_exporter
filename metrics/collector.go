@@ -61,8 +61,9 @@ func GetResourceList(resourceconfig *viper.Viper, dataconfig *viper.Viper,metric
 func Dispatch(id, key string, metric_chan chan MetricChannel){
 	// 定义collector 并通过collector来采集数据
 	MetricCollector := new(MetricObj)
-	Metricdata := make(map[string][]Data)
-	MetricCollector.MetricData = Metricdata
+	Metrics := make(map[string][]Data)
+	Products := make(map[string][]*Product)
+	MetricCollector.Products = Products
 
 	// 获取client
 	client := GetClient(id,key)
