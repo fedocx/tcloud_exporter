@@ -12,6 +12,7 @@
 package collector
 
 import (
+	"fmt"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/spf13/viper"
 	"tcloud_exporter/metrics"
@@ -81,15 +82,18 @@ func ReadMetrics(metriccollector *metrics.MetricObj,dataconfig *viper.Viper,obje
 	//namespace := metrics.GetMysqlCode()
 	//name := metrics.NamespaceToNameMap(namespace)
 	// key mysql
-	for key,val := range object_gauge.Object{
-		for _,vec := range val{
-			// metric_name : netin   metric_value 123
-			for metric_name,metric_value := range vec.Gauge{
-				GetGuage(metric_name,metric_value,metriccollector,key)
+	for {
+		for key,val := range object_gauge.Object{
+			fmt.Println("再次更新数据")
+			for _,vec := range val{
+				// metric_name : netin   metric_value 123
+				for metric_name,metric_value := range vec.Gauge{
+					GetGuage(metric_name,metric_value,metriccollector,key)
 
+				}
 			}
 		}
-		time.Sleep(time.Second * 1)
+		time.Sleep(time.Second * 60)
 
 	}
 
