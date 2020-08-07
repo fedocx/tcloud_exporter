@@ -61,7 +61,7 @@ func GetResourceList(resourceconfig *viper.Viper, dataconfig *viper.Viper,metric
 func Dispatch(id, key string, metric_chan chan MetricChannel){
 	// 定义collector 并通过collector来采集数据
 	MetricCollector := new(MetricObj)
-	Metrics := make(map[string][]Data)
+	//Metrics := make(map[string][]*Data)
 	Products := make(map[string][]*Product)
 	MetricCollector.Products = Products
 
@@ -74,4 +74,31 @@ func Dispatch(id, key string, metric_chan chan MetricChannel){
 		}
 		time.Sleep(time.Second * 1)
 	}
+}
+
+func NamespaceToNameMap(namespace string)string{
+	var name string
+	switch namespace {
+	case "QCE/CMONGO":
+		name = "mongodb"
+	case "QCE/CDB":
+		name = "mysql"
+	default:
+		name = "unknown"
+	}
+	return name
+
+}
+
+func NameToNamespaceMap(name string)string{
+	var namespace string
+	switch name {
+	case "mysql":
+		namespace = "QCE/CDB"
+	case "mongodb":
+		namespace =  "QCE/CMONGO"
+	default:
+		namespace = "unknown"
+	}
+	return namespace
 }

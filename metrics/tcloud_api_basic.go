@@ -29,15 +29,13 @@ type Data struct {
 }
 
 type Product struct{
-	Metrics map[string][]Data
+	Metrics map[string][]*Data
 }
 
 
 // struct for collector
 type MetricObj struct {
 	Products  map[string][]*Product
-	//MetricName string
-	//Data []Data
 }
 
 
@@ -93,7 +91,7 @@ func GetCpf() *profile.ClientProfile {
 
 func FormatMetrics(productname string,response *monitor.GetMonitorDataResponse, MetricCollector *MetricObj) {
 	//metrics := make(map[string]float64)
-	datas := make([]Data, 0)
+	datas := make([]*Data, 0)
 	for _, i := range response.Response.DataPoints {
 
 		instanceid := *i.Dimensions[0].Value
@@ -104,11 +102,17 @@ func FormatMetrics(productname string,response *monitor.GetMonitorDataResponse, 
 			continue
 		}
 		data := Data{instanceid, value}
-		datas = append(datas, data)
+		datas = append(datas, &data)
 	}
-	metrics := new(Product)
-	metrics.Metrics[*response.Response.MetricName] = datas
-	MetricCollector.Products[productname] = append(MetricCollector.Products[productname],metrics)
+	//metrics := new(Product)
+	metrics := make(map[string][]*Data)
+	Metrics := new(Product)
+	Metrics.Metrics = metrics
+
+
+	Metrics.Metrics[*response.Response.MetricName] = datas
+	productname = NamespaceToNameMap(productname)
+	MetricCollector.Products[productname] = append(MetricCollector.Products[productname],Metrics)
 	//MetricCollector.Products[productname].[*response.Response.MetricName] = datas
 	fmt.Println(MetricCollector.Products)
 }

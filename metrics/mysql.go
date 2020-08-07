@@ -12,34 +12,10 @@
 
 package metrics
 
-type Mysql struct {
-}
-
-//func GetMysqlMetrics(client *monitor.Client,MetricCollector *MetricObj, resourceconfig *viper.Viper, dataconfig *viper.Viper) *MetricObj {
-//
-//
-//	//mysql register
-//	mysqlmetrics := utils.GetMysqlMetrics(dataconfig)
-//
-//	// 获取指标
-//	for _, val := range mysqlmetrics {
-//		fmt.Println(val)
-//		GetMysqlMetric(client, MetricCollector, val, resourceconfig)
-//	}
-//	return MetricCollector
-//}
-
-//func GetMysqlMetric(client *monitor.Client, MetricCollector *MetricObj, metrictype string, resourceconfig *viper.Viper) {
-//	GetMetrics(client, MetricCollector, "QCE/CDB", metrictype, resourceconfig)
-//}
-
 func GetMysqlCode()string{
 	return "QCE/CDB"
 }
 
-//func SendMysqlMetric(client *monitor.Client, MetricCollector *MetricObj, metrictype string, resourceconfig *viper.Viper){
-//
-//}
 func GetMysqlInstancename()string{
 	return "InstanceId"
 }
