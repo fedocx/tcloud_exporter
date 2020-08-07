@@ -58,12 +58,7 @@ func GetResourceList(resourceconfig *viper.Viper, dataconfig *viper.Viper,metric
 
 
 // 调度器，用于控制腾讯云接口访问频率
-func Dispatch(id, key string, metric_chan chan MetricChannel){
-	// 定义collector 并通过collector来采集数据
-	MetricCollector := new(MetricObj)
-	//Metrics := make(map[string][]*Data)
-	Products := make(map[string][]*Product)
-	MetricCollector.Products = Products
+func Dispatch(id, key string, metric_chan chan MetricChannel,MetricCollector *MetricObj){
 
 	// 获取client
 	client := GetClient(id,key)

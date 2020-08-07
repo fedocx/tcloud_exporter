@@ -16,9 +16,11 @@ import (
 	"tcloud_exporter/metrics"
 )
 
-func GetGuage(metricname string,gaugevec *prometheus.GaugeVec,metrics *metrics.MetricObj){
-	for _,val := range metrics.MetricData[metricname] {
-		i,_ := gaugevec.GetMetricWithLabelValues(val.Key)
-		i.Set(val.Value)
+func GetGuage(metricname string,gaugevec *prometheus.GaugeVec,metriccollector *metrics.MetricObj,name string){
+	for _,metric := range metriccollector.Products[name] {
+		for _,val := range metric.Metrics[metricname]{
+			i,_ := gaugevec.GetMetricWithLabelValues(val.Key)
+			i.Set(val.Value)
+		}
 	}
 }
