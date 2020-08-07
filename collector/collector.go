@@ -13,14 +13,27 @@ package collector
 
 import (
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/spf13/viper"
 	"tcloud_exporter/metrics"
+	"tcloud_exporter/utils"
 	"time"
 )
 
+type Metric_Gauge struct{
+	Gauge map[string]*prometheus.GaugeVec
+}
+type Object_Gauge struct{
+	Object map[string][]*Metric_Gauge
+}
+
 // 消费指标
-func MetricsConsumer(metrics *metrics.MetricObj){
-	go MysqlRegister(metrics)
-	go MongodbRegister(metrics)
+func MetricsConsumer(metrics *metrics.MetricObj, dataconfig *viper.Viper){
+	gauge_maps := make(map[string][]*Metric_Gauge)
+	object_gauge := new(Object_Gauge)
+	object_gauge.Object = gauge_maps
+	MysqlRegister(metrics,dataconfig,object_gauge)
+	MongodbRegister(metrics,dataconfig,object_gauge)
+	ReadMetrics(metrics,dataconfig,object_gauge)
 }
 
 // 定义监控指标，对于mysql采集哪些指标，并对这些指标进行注册。
@@ -31,56 +44,53 @@ func Register(namespace, subsystem, name, help string)(*prometheus.GaugeVec){
 		Name: name,
 		Help: help,
 	}, []string{"instance"})
+	prometheus.MustRegister(a)
 	return a
 }
 
 // 获取mysql的指标信息
-func MysqlRegister(metriccollector *metrics.MetricObj){
-	namespace := metrics.GetMysqlCode()
-	name := metrics.NamespaceToNameMap(namespace)
-	metrics.GetMysqlCode()
-	mysqlDiskUse := Register("tcloud","database_mysql","disk","Number of blob storage operations wa=itingto be processed.")
-	mysqlCpuUseRate := Register("tcloud","database_mysql","cpu","Number of blob storage operations wa=itingto be processed.")
-	mysqlMemUseRate := Register("tcloud","database_mysql","mem","Number of blob storage operations wa=itingto be processed.")
-	mysqlNetOut := Register("tcloud","database_mysql","net_in","Number of blob storage operations wa=itingto be processed.")
-	mysqlNetIn := Register("tcloud","database_mysql","net_out","Number of blob storage operations wa=itingto be processed.")
-
-	// 注册
-	prometheus.MustRegister(mysqlDiskUse)
-	prometheus.MustRegister(mysqlCpuUseRate)
-	prometheus.MustRegister(mysqlMemUseRate)
-	prometheus.MustRegister(mysqlNetOut)
-	prometheus.MustRegister(mysqlNetIn)
-
-	// 获取指标
-	for {
-		GetGuage("CPUUseRate",mysqlCpuUseRate,metriccollector,name)
-		GetGuage("MemoryUseRate",mysqlMemUseRate,metriccollector,name)
-		GetGuage("VolumeRate",mysqlDiskUse,metriccollector,name)
-		GetGuage("BytesSent",mysqlNetOut,metriccollector,name)
-		GetGuage("BytesReceived",mysqlNetIn,metriccollector,name)
-		time.Sleep(time.Second * 60)
-
+func MysqlRegister(metriccollector *metrics.MetricObj,dataconfig *viper.Viper,object_gauge *Object_Gauge){
+	gauge_map := make(map[string]*prometheus.GaugeVec)
+	gauge_maps := new(Metric_Gauge)
+	gauge_maps.Gauge = gauge_map
+	mysql_metrics := utils.GetMysqlMetrics(dataconfig)
+	for _,val := range mysql_metrics{
+		gauge_maps.Gauge[val] = Register("tcloud","database_mysql",val,"Number of blob storage operations wa=itingto be processed.")
 	}
-
+	object_gauge.Object["mysql"] = append(object_gauge.Object["mysql"],gauge_maps)
 }
 
-func MongodbRegister(metriccollector *metrics.MetricObj){
-	namespace := metrics.GetMongoCode()
-	name := metrics.NamespaceToNameMap(namespace)
-	metrics.GetMysqlCode()
-	mongoNetin := Register("tcloud","database_mongo","netin","Number of blob storage operations wa=itingto be processed.")
-	mongoNetout := Register("tcloud","database_mongo","netout","Number of blob storage operations wa=itingto be processed.")
+func MongodbRegister(metriccollector *metrics.MetricObj,dataconfig *viper.Viper,object_gauge *Object_Gauge){
+	gauge_map := make(map[string]*prometheus.GaugeVec)
+	gauge_maps := new(Metric_Gauge)
+	gauge_maps.Gauge = gauge_map
 
-	// 注册
-	prometheus.MustRegister(mongoNetin)
-	prometheus.MustRegister(mongoNetout)
+	mongodb_metrics := utils.GetMongoMetrics(dataconfig)
+	for _,val := range mongodb_metrics{
+		gauge_maps.Gauge[val] = Register("tcloud","database_mongodb",val,"Number of blob storage operations wa=itingto be processed.")
 
+	}
+	object_gauge.Object["mongodb"] = append(object_gauge.Object["mongodb"],gauge_maps)
+}
+
+func ReadMetrics(metriccollector *metrics.MetricObj,dataconfig *viper.Viper,object_gauge *Object_Gauge){
+
+	// 休息10s钟，等接口从腾讯云获取完数据,存放到metriccollector之后再开始
+	time.Sleep(time.Second * 10)
 	// 获取指标
-	for {
-		GetGuage("Netin", mongoNetin, metriccollector, name)
-		GetGuage("Netout", mongoNetout, metriccollector, name)
-		time.Sleep(time.Second * 60)
+	//namespace := metrics.GetMysqlCode()
+	//name := metrics.NamespaceToNameMap(namespace)
+	// key mysql
+	for key,val := range object_gauge.Object{
+		for _,vec := range val{
+			// metric_name : netin   metric_value 123
+			for metric_name,metric_value := range vec.Gauge{
+				GetGuage(metric_name,metric_value,metriccollector,key)
+
+			}
+		}
+		time.Sleep(time.Second * 1)
+
 	}
 
 }

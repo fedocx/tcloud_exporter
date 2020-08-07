@@ -12,7 +12,6 @@
 package metrics
 
 import (
-	"fmt"
 	"github.com/spf13/viper"
 	"tcloud_exporter/utils"
 	"time"
@@ -33,7 +32,6 @@ func GetResourceList(resourceconfig *viper.Viper, dataconfig *viper.Viper,metric
 	for _, val := range objects {
 		switch val{
 		case "mysql":
-			fmt.Println("mysql------------")
 			instancelist := utils.GetMysqlInstance(resourceconfig)
 			data := utils.GetMysqlMetrics(dataconfig)
 			for _,mysqlmetric := range data{
@@ -43,7 +41,6 @@ func GetResourceList(resourceconfig *viper.Viper, dataconfig *viper.Viper,metric
 
 			}
 		case "mongodb":
-			fmt.Println("mongo------------")
 			instancelist := utils.GetMongoInstance(resourceconfig)
 			data := utils.GetMongoMetrics(dataconfig)
 			for _,mongometric := range data{

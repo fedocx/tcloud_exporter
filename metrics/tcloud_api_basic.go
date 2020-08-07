@@ -55,13 +55,14 @@ func GetMetrics(client *monitor.Client, MetricCollector *MetricObj, value_temp M
 	// instance 设置
 
 	// print request delete
-	fmt.Println(apinamespace,metrictype,instancelist)
+	//fmt.Println(apinamespace,metrictype,instancelist)
 
 	AddInstance(request, instancelist,instancename)
 	// 发起请求
 	response, err := client.GetMonitorData(request)
 	// 异常处理
 	if _, ok := err.(*errors.TencentCloudSDKError); ok {
+		fmt.Println(*request.Namespace,*request.Namespace,*request.Instances[0].Dimensions[0])
 		fmt.Printf("An API error has returned : %s", err)
 		return
 	}
@@ -114,7 +115,7 @@ func FormatMetrics(productname string,response *monitor.GetMonitorDataResponse, 
 	productname = NamespaceToNameMap(productname)
 	MetricCollector.Products[productname] = append(MetricCollector.Products[productname],Metrics)
 	//MetricCollector.Products[productname].[*response.Response.MetricName] = datas
-	fmt.Println(MetricCollector.Products)
+	//fmt.Println(MetricCollector.Products)
 }
 
 func AddInstance(request *monitor.GetMonitorDataRequest, instancelist []string, instancename string) {

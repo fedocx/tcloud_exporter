@@ -4,6 +4,16 @@ mysql:
   - BytesSent
   - BytesReceived
   - VolumeRate
+  - QPS
+  - MaxConnections
+  - ThreadsConnected
+  - SlowQueries
+  - Queries
+  - MasterSlaveSyncDistance
+  - SecondsBehindMaster
 mongodb:
   - Netin
   - Netout
+  - Cpuusage
+  - Memusage
+  - Conn
