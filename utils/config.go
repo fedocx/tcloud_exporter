@@ -17,6 +17,12 @@ func GetMongoInstance(resourceconfig *viper.Viper)[]string{
 	mongo := resourceconfig.GetStringSlice("mongodb")
 	return  mongo
 }
+
+func GetRedisInstance(resourceconfig *viper.Viper)[]string{
+	redis := resourceconfig.GetStringSlice("redis")
+	return redis
+}
+
 func GetMysqlMetrics(dataconfig *viper.Viper)[]string{
 	mysql := dataconfig.GetStringSlice("mysql")
 	return mysql
@@ -25,4 +31,9 @@ func GetMysqlMetrics(dataconfig *viper.Viper)[]string{
 func GetMongoMetrics(dataconfig *viper.Viper)[]string{
 	mongo := dataconfig.GetStringSlice("mongodb")
 	return mongo
+}
+
+func GetRedisMetrics(dataconfig *viper.Viper)[]string{
+	redis := dataconfig.GetStringSlice("redis")
+	return redis
 }

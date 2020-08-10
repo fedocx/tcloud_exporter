@@ -50,6 +50,14 @@ func GetResourceList(resourceconfig *viper.Viper, dataconfig *viper.Viper,metric
 					instancename := GetMongoInstancename()
 					metric_chan <- MetricChannel{Apinamespace: code,MetricType: mongometric,InstanceList: instancelist,InstanceName: instancename}
 				}
+			case "redis":
+				instancelist := utils.GetRedisInstance(resourceconfig)
+				data := utils.GetRedisMetrics(dataconfig)
+				for _,mongometric := range data{
+					code := GetRedisCode()
+					instancename := GetRedisInstancename()
+					metric_chan <- MetricChannel{Apinamespace: code,MetricType: mongometric,InstanceList: instancelist,InstanceName: instancename}
+				}
 			}
 		}
 		time.Sleep(time.Second * 60)
@@ -81,6 +89,8 @@ func NamespaceToNameMap(namespace string)string{
 		name = "mongodb"
 	case "QCE/CDB":
 		name = "mysql"
+	case "QCE/REDIS":
+		name = "redis"
 	default:
 		name = "unknown"
 	}
@@ -95,6 +105,8 @@ func NameToNamespaceMap(name string)string{
 		namespace = "QCE/CDB"
 	case "mongodb":
 		namespace =  "QCE/CMONGO"
+	case "redis":
+		namespace =  "QCE/REDIS"
 	default:
 		namespace = "unknown"
 	}

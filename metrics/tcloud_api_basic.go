@@ -49,7 +49,7 @@ func GetMetrics(client *monitor.Client, MetricCollector *MetricObj, value_temp M
 	request := monitor.NewGetMonitorDataRequest()
 	request.Namespace = common.StringPtr(apinamespace)
 	request.MetricName = common.StringPtr(metrictype)
-	request.Period = common.Uint64Ptr(300)
+	//request.Period = common.Uint64Ptr(300)
 	//设置采集时间
 	utils.SetTimeRange(request)
 	// instance 设置
@@ -62,7 +62,7 @@ func GetMetrics(client *monitor.Client, MetricCollector *MetricObj, value_temp M
 	response, err := client.GetMonitorData(request)
 	// 异常处理
 	if _, ok := err.(*errors.TencentCloudSDKError); ok {
-		fmt.Println(*request.Namespace,*request.Namespace,*request.Instances[0].Dimensions[0])
+		fmt.Println(*request.Namespace,*request.MetricName,*request.Instances[0].Dimensions[0])
 		fmt.Printf("An API error has returned : %s", err)
 		return
 	}

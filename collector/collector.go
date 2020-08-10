@@ -34,6 +34,7 @@ func MetricsConsumer(metrics *metrics.MetricObj, dataconfig *viper.Viper){
 	object_gauge.Object = gauge_maps
 	MysqlRegister(metrics,dataconfig,object_gauge)
 	MongodbRegister(metrics,dataconfig,object_gauge)
+	RedisRegister(metrics,dataconfig,object_gauge)
 	ReadMetrics(metrics,dataconfig,object_gauge)
 }
 
@@ -74,6 +75,20 @@ func MongodbRegister(metriccollector *metrics.MetricObj,dataconfig *viper.Viper,
 	object_gauge.Object["mongodb"] = append(object_gauge.Object["mongodb"],gauge_maps)
 }
 
+func RedisRegister(metriccollector *metrics.MetricObj,dataconfig *viper.Viper,object_gauge *Object_Gauge){
+	gauge_map := make(map[string]*prometheus.GaugeVec)
+	gauge_maps := new(Metric_Gauge)
+	gauge_maps.Gauge = gauge_map
+
+	mongodb_metrics := utils.GetRedisMetrics(dataconfig)
+	for _,val := range mongodb_metrics{
+		gauge_maps.Gauge[val] = Register("tcloud","database_redis",val,"Number of blob storage operations wa=itingto be processed.")
+		fmt.Println("redis注册成功",val)
+
+	}
+	object_gauge.Object["redis"] = append(object_gauge.Object["redis"],gauge_maps)
+}
+
 func ReadMetrics(metriccollector *metrics.MetricObj,dataconfig *viper.Viper,object_gauge *Object_Gauge){
 
 	// 休息10s钟，等接口从腾讯云获取完数据,存放到metriccollector之后再开始
@@ -84,7 +99,7 @@ func ReadMetrics(metriccollector *metrics.MetricObj,dataconfig *viper.Viper,obje
 	// key mysql
 	for {
 		for key,val := range object_gauge.Object{
-			fmt.Println("再次更新数据")
+			fmt.Println("再次更新数据",key)
 			for _,vec := range val{
 				// metric_name : netin   metric_value 123
 				for metric_name,metric_value := range vec.Gauge{
