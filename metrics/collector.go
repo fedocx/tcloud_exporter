@@ -18,45 +18,51 @@ import (
 	"time"
 )
 
-type MetricChannel struct{
+type Tcloud_db interface {
+	GetCode() string
+	GetInstanceList() map[string]string
+}
+
+type MetricChannel struct {
 	Apinamespace string
-	MetricType string
+	MetricType   string
 	InstanceList []string
 	InstanceName string
 }
 
 // 根据当前配置信息，获取配置里面的数据库项，并根据数据库项获取响应的数据库指标,通过goroutin方式执行
-func GetResourceList(resourceconfig *viper.Viper, dataconfig *viper.Viper,metric_chan chan MetricChannel) {
+func GetResourceList(resourceconfig *viper.Viper, dataconfig *viper.Viper, metric_chan chan MetricChannel) {
 
 	// 获取配置文件采集项
 	objects := dataconfig.AllKeys()
-	for{
+	for {
 		for _, val := range objects {
-			switch val{
+			switch val {
 			case "mysql":
+				mysql := new(Mysql)
 				instancelist := utils.GetMysqlInstance(resourceconfig)
 				data := utils.GetMysqlMetrics(dataconfig)
-				for _,mysqlmetric := range data{
-					code := GetMysqlCode()
-					instancename := GetMysqlInstancename()
-					metric_chan <- MetricChannel{Apinamespace: code,MetricType: mysqlmetric,InstanceList: instancelist,InstanceName: instancename}
+				for _, mysqlmetric := range data {
+					code := mysql.GetCode()
+					instancename := mysql.GetInstanceList(resourceconfig)
+					metric_chan <- MetricChannel{Apinamespace: code, MetricType: mysqlmetric, InstanceList: instancelist, InstanceName: instancename}
 
 				}
 			case "mongodb":
 				instancelist := utils.GetMongoInstance(resourceconfig)
 				data := utils.GetMongoMetrics(dataconfig)
-				for _,mongometric := range data{
+				for _, mongometric := range data {
 					code := GetMongoCode()
 					instancename := GetMongoInstancename()
-					metric_chan <- MetricChannel{Apinamespace: code,MetricType: mongometric,InstanceList: instancelist,InstanceName: instancename}
+					metric_chan <- MetricChannel{Apinamespace: code, MetricType: mongometric, InstanceList: instancelist, InstanceName: instancename}
 				}
 			case "redis":
 				instancelist := utils.GetRedisInstance(resourceconfig)
 				data := utils.GetRedisMetrics(dataconfig)
-				for _,mongometric := range data{
+				for _, mongometric := range data {
 					code := GetRedisCode()
 					instancename := GetRedisInstancename()
-					metric_chan <- MetricChannel{Apinamespace: code,MetricType: mongometric,InstanceList: instancelist,InstanceName: instancename}
+					metric_chan <- MetricChannel{Apinamespace: code, MetricType: mongometric, InstanceList: instancelist, InstanceName: instancename}
 				}
 			}
 		}
@@ -65,24 +71,22 @@ func GetResourceList(resourceconfig *viper.Viper, dataconfig *viper.Viper,metric
 	}
 }
 
-
-
 // 调度器，用于控制腾讯云接口访问频率
-func Dispatch(id, key string, metric_chan chan MetricChannel,MetricCollector *MetricObj){
+func Dispatch(id, key string, metric_chan chan MetricChannel, MetricCollector *MetricObj) {
 
 	// 获取client
-	client := GetClient(id,key)
+	client := GetClient(id, key)
 	for {
 		//value_temp := <- metric_chan
-		for i:=0;i<=10;i++{
-			fmt.Println("执行指标采集",i)
-			GetMetrics(client,MetricCollector,<- metric_chan)
+		for i := 0; i <= 10; i++ {
+			fmt.Println("执行指标采集", i)
+			GetMetrics(client, MetricCollector, <-metric_chan)
 		}
 		time.Sleep(time.Second * 1)
 	}
 }
 
-func NamespaceToNameMap(namespace string)string{
+func NamespaceToNameMap(namespace string) string {
 	var name string
 	switch namespace {
 	case "QCE/CMONGO":
@@ -98,15 +102,15 @@ func NamespaceToNameMap(namespace string)string{
 
 }
 
-func NameToNamespaceMap(name string)string{
+func NameToNamespaceMap(name string) string {
 	var namespace string
 	switch name {
 	case "mysql":
 		namespace = "QCE/CDB"
 	case "mongodb":
-		namespace =  "QCE/CMONGO"
+		namespace = "QCE/CMONGO"
 	case "redis":
-		namespace =  "QCE/REDIS"
+		namespace = "QCE/REDIS"
 	default:
 		namespace = "unknown"
 	}

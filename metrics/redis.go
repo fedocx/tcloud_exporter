@@ -11,11 +11,12 @@
 // limitations under the License.
 package metrics
 
-type Redis struct{
+import "github.com/spf13/viper"
 
+type Redis struct {
 }
 
-func (t *Redis)GetCode()string{
+func (t *Redis) GetCode() string {
 	return "QCE/REDIS"
 }
 
@@ -23,3 +24,8 @@ func (t *Redis)GetCode()string{
 //	//return "InstanceId"
 //	return "instanceid"
 //}
+func (t *Redis) GetInstanceList(resourceconfig *viper.Viper) map[string]string {
+
+	return resourceconfig.GetStringMapString("redis")
+
+}

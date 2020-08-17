@@ -11,13 +11,20 @@
 // limitations under the License.
 package metrics
 
-type Mongodb struct{
+import "github.com/spf13/viper"
 
+type Mongodb struct {
 }
-func (t *Mongodb)GetCode()string{
+
+func (t *Mongodb) GetCode() string {
 	return "QCE/CMONGO"
 }
 
 //func (t *Mongodb)GetInstancename()string{
 //	return "target"
 //}
+
+func (t *Mongodb) GetInstanceList(resourceconfig *viper.Viper) map[string]string {
+	return resourceconfig.GetStringMapString("mongodb")
+
+}

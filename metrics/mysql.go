@@ -12,14 +12,19 @@
 
 package metrics
 
-type Mysql struct{
+import "github.com/spf13/viper"
 
+type Mysql struct {
 }
 
-func (t *Mysql)GetCode()string{
+func (t *Mysql) GetCode() string {
 	return "QCE/CDB"
 }
 
 //func (t *Mysql)GetInstancename()string{
 //	return "InstanceId"
 //}
+func (t *Mysql) GetInstanceList(resourceconfig *viper.Viper) map[string]string {
+	return resourceconfig.GetStringMapString("mysql")
+
+}

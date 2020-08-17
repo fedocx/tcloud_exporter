@@ -10,13 +10,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 package metrics
-type Kafka struct{
 
+import "github.com/spf13/viper"
+
+type Kafka struct {
 }
-func (t *Kafka)GetCode()string{
+
+func (t *Kafka) GetCode() string {
 	return "QCE/CKAFKA"
 }
 
 //func (t *Kafka)GetInstancename()string{
 //	return "consumerGroup"
 //}
+func (t *Kafka) GetInstanceList(resourceconfig *viper.Viper) map[string]string {
+	return resourceconfig.GetStringMapString("kafka")
+
+}
