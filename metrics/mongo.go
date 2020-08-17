@@ -11,10 +11,13 @@
 // limitations under the License.
 package metrics
 
-func GetMongoCode()string{
+type Mongodb struct{
+
+}
+func (t *Mongodb)GetCode()string{
 	return "QCE/CMONGO"
 }
 
-func GetMongoInstancename()string{
-	return "target"
-}
+//func (t *Mongodb)GetInstancename()string{
+//	return "target"
+//}

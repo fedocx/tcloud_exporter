@@ -11,10 +11,15 @@
 // limitations under the License.
 package metrics
 
-func GetRedisCode()string{
+type Redis struct{
+
+}
+
+func (t *Redis)GetCode()string{
 	return "QCE/REDIS"
 }
 
-func GetRedisInstancename()string{
-	return "InstanceId"
-}
+//func (t *Redis)GetInstancename()string{
+//	//return "InstanceId"
+//	return "instanceid"
+//}

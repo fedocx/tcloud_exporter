@@ -13,15 +13,10 @@ package main
 
 import (
 	"flag"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"fmt"
 	"github.com/spf13/viper"
-	"log"
-	"net/http"
 	"os"
-	"tcloud_exporter/collector"
-	"tcloud_exporter/metrics"
 	"tcloud_exporter/utils"
-	"time"
 )
 
 var TENCENTCLOUD_SECRET_ID, TENCENTCLOUD_SECRET_KEY string
@@ -54,27 +49,29 @@ var addr = flag.String("listen-addr", ":8081", "the port to listen on for HTTP r
 
 func main() {
 
-	resourceconfig, dataconfig := InitConfig()
-	TENCENTCLOUD_SECRET_ID, TENCENTCLOUD_SECRET_KEY = utils.GetAuthInfo(resourceconfig)
-
-	// 定义collector 并通过collector来采集数据
-	MetricCollector := new(metrics.MetricObj)
-	MetricCollector.Products = make(map[string][]*metrics.Product)
-
-	// 生成channel，用于对指标进行消费
-	var metric_channel = make(chan metrics.MetricChannel,10)
-
-
-	go metrics.GetResourceList(resourceconfig,dataconfig, metric_channel)
-	// 消费指标，从腾讯云获取监控数据，并将指标存放到MetricCollector列表中
-	go metrics.Dispatch(TENCENTCLOUD_SECRET_ID, TENCENTCLOUD_SECRET_KEY,  metric_channel, MetricCollector)
-
-	go collector.MetricsConsumer(MetricCollector,dataconfig)
-
-
-	flag.Parse()
-	http.Handle("/metrics",promhttp.Handler())
-	log.Fatal(http.ListenAndServe(*addr,nil))
-	time.Sleep(time.Minute * 2)
+	//resourceconfig, dataconfig := InitConfig()
+	//TENCENTCLOUD_SECRET_ID, TENCENTCLOUD_SECRET_KEY = utils.GetAuthInfo(resourceconfig)
+	//
+	//// 定义collector 并通过collector来采集数据
+	//MetricCollector := new(metrics.MetricObj)
+	//MetricCollector.Products = make(map[string][]*metrics.Product)
+	//
+	//// 生成channel，用于对指标进行消费
+	//var metric_channel = make(chan metrics.MetricChannel,10)
+	//
+	//
+	//go metrics.GetResourceList(resourceconfig,dataconfig, metric_channel)
+	//// 消费指标，从腾讯云获取监控数据，并将指标存放到MetricCollector列表中
+	//go metrics.Dispatch(TENCENTCLOUD_SECRET_ID, TENCENTCLOUD_SECRET_KEY,  metric_channel, MetricCollector)
+	//
+	//go collector.MetricsConsumer(MetricCollector,dataconfig)
+	//
+	//
+	//flag.Parse()
+	//http.Handle("/metrics",promhttp.Handler())
+	//log.Fatal(http.ListenAndServe(*addr,nil))
+	//time.Sleep(time.Minute * 2)
+	resourceconfig,_ := InitConfig()
+	fmt.Println(utils.GetMysqlInstance(resourceconfig))
 
 }

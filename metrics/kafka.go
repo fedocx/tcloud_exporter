@@ -9,17 +9,14 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
 package metrics
-
-type Mysql struct{
+type Kafka struct{
 
 }
-
-func (t *Mysql)GetCode()string{
-	return "QCE/CDB"
+func (t *Kafka)GetCode()string{
+	return "QCE/CKAFKA"
 }
 
-//func (t *Mysql)GetInstancename()string{
-//	return "InstanceId"
+//func (t *Kafka)GetInstancename()string{
+//	return "consumerGroup"
 //}

@@ -8,8 +8,9 @@ func GetAuthInfo(resourceconfig *viper.Viper)(string,string){
 	return TENCENTCLOUD_SECRET_ID,TENCENTCLOUD_SECRET_KEY
 }
 
-func GetMysqlInstance(resourceconfig *viper.Viper)[]string{
-	mysql := resourceconfig.GetStringSlice("mysql")
+func GetMysqlInstance(resourceconfig *viper.Viper)map[string]string{
+	//mysql := resourceconfig.GetStringSlice("mysql")
+	mysql := resourceconfig.GetStringMapString("mysql")
 	return  mysql
 }
 
