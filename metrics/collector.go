@@ -29,14 +29,14 @@ type MetricChannel struct {
 	Apinamespace string
 	MetricType   string
 	InstanceName  Tcloud_db
-	Config *Config
+	Config []map[string]string
 }
 
 type Config struct{
-	Mysql []Mysql_instance
-	Redis []Redis_instance
-	Mongodb []Mongodb_instance
-	Kafka []Kafka_instance
+	Mysql []map[string]string
+	Redis []map[string]string
+	Mongodb []map[string]string
+	Kafka []map[string]string
 }
 
 // 根据当前配置信息，获取配置里面的数据库项，并根据数据库项获取响应的数据库指标,通过goroutin方式执行
@@ -59,7 +59,8 @@ func GetResourceList(resourceconfig *viper.Viper, dataconfig *viper.Viper, metri
 				data := utils.GetMysqlMetrics(dataconfig)
 				for _, mysqlmetric := range data {
 					code := tclouddb.GetCode()
-					metric_chan <- MetricChannel{Apinamespace: code, MetricType: mysqlmetric, InstanceName: tclouddb, Config: config}
+					mysql_config := config.Mysql
+					metric_chan <- MetricChannel{Apinamespace: code, MetricType: mysqlmetric, InstanceName: tclouddb, Config: mysql_config}
 
 				}
 			case "mongodb":
@@ -67,14 +68,16 @@ func GetResourceList(resourceconfig *viper.Viper, dataconfig *viper.Viper, metri
 				data := utils.GetMongoMetrics(dataconfig)
 				for _, mongometric := range data {
 					code := tclouddb.GetCode()
-					metric_chan <- MetricChannel{Apinamespace: code, MetricType: mongometric, InstanceName: tclouddb, Config: config}
+					mongodb_config := config.Mongodb
+					metric_chan <- MetricChannel{Apinamespace: code, MetricType: mongometric, InstanceName: tclouddb, Config: mongodb_config}
 				}
 			case "redis":
 				tclouddb = new(Redis)
 				data := utils.GetRedisMetrics(dataconfig)
 				for _, mongometric := range data {
 					code := tclouddb.GetCode()
-					metric_chan <- MetricChannel{Apinamespace: code, MetricType: mongometric, InstanceName: tclouddb, Config: config}
+					redis_config := config.Redis
+					metric_chan <- MetricChannel{Apinamespace: code, MetricType: mongometric, InstanceName: tclouddb, Config: redis_config}
 				}
 			}
 		}

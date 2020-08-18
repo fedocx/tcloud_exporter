@@ -43,7 +43,7 @@ func GetMetrics(client *monitor.Client, MetricCollector *MetricObj, value_temp M
 	//参数初始化
 	apinamespace := value_temp.Apinamespace
 	metrictype := value_temp.MetricType
-	instancename := value_temp.InstanceName
+	//instancename := value_temp.InstanceName
 	config := value_temp.Config
 	// 创建并设置请求参数
 	request := monitor.NewGetMonitorDataRequest()
@@ -58,7 +58,7 @@ func GetMetrics(client *monitor.Client, MetricCollector *MetricObj, value_temp M
 	//fmt.Println(apinamespace,metrictype,instancelist)
 
 	//AddInstance(request, instancelist)
-	instancename.AddInstance(request,config)
+	AddInstance(request,config)
 	// 发起请求
 	response, err := client.GetMonitorData(request)
 	// 异常处理
