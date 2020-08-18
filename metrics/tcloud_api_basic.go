@@ -43,8 +43,8 @@ func GetMetrics(client *monitor.Client, MetricCollector *MetricObj, value_temp M
 	//参数初始化
 	apinamespace := value_temp.Apinamespace
 	metrictype := value_temp.MetricType
-	instancelist := value_temp.InstanceList
 	instancename := value_temp.InstanceName
+	config := value_temp.Config
 	// 创建并设置请求参数
 	request := monitor.NewGetMonitorDataRequest()
 	request.Namespace = common.StringPtr(apinamespace)
@@ -57,7 +57,8 @@ func GetMetrics(client *monitor.Client, MetricCollector *MetricObj, value_temp M
 	// print request delete
 	//fmt.Println(apinamespace,metrictype,instancelist)
 
-	AddInstance(request, instancelist,instancename)
+	//AddInstance(request, instancelist)
+	instancename.AddInstance(request,config)
 	// 发起请求
 	response, err := client.GetMonitorData(request)
 	// 异常处理
@@ -118,13 +119,15 @@ func FormatMetrics(productname string,response *monitor.GetMonitorDataResponse, 
 	//fmt.Println(MetricCollector.Products)
 }
 
-func AddInstance(request *monitor.GetMonitorDataRequest, instancelist []string, instancename string) {
+func AddInstance(request *monitor.GetMonitorDataRequest, instancelist []map[string]string) {
 	//mysqllist := utils.GetMysqlInstance(resourceconfig)
 	list_instance := []*monitor.Instance{}
 	for _, str := range instancelist {
 		list_dimension := []*monitor.Dimension{}
-		dimension := &monitor.Dimension{common.StringPtr(instancename), common.StringPtr(str)}
-		list_dimension = append(list_dimension, dimension)
+		for key,val := range str{
+			dimension := &monitor.Dimension{common.StringPtr(key), common.StringPtr(val)}
+			list_dimension = append(list_dimension, dimension)
+		}
 		instance := &monitor.Instance{list_dimension}
 		list_instance = append(list_instance, instance)
 

@@ -14,20 +14,29 @@ package metrics
 import (
 	"fmt"
 	"github.com/spf13/viper"
+	monitor "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/monitor/v20180724"
 	"tcloud_exporter/utils"
 	"time"
 )
 
 type Tcloud_db interface {
 	GetCode() string
-	GetInstanceList() map[string]string
+	Rangeinstance(config *Config)
+	AddInstance(request  *monitor.GetMonitorDataRequest, config *Config)
 }
 
 type MetricChannel struct {
 	Apinamespace string
 	MetricType   string
-	InstanceList []string
-	InstanceName string
+	InstanceName  Tcloud_db
+	Config *Config
+}
+
+type Config struct{
+	Mysql []Mysql_instance
+	Redis []Redis_instance
+	Mongodb []Mongodb_instance
+	Kafka []Kafka_instance
 }
 
 // 根据当前配置信息，获取配置里面的数据库项，并根据数据库项获取响应的数据库指标,通过goroutin方式执行
@@ -35,34 +44,37 @@ func GetResourceList(resourceconfig *viper.Viper, dataconfig *viper.Viper, metri
 
 	// 获取配置文件采集项
 	objects := dataconfig.AllKeys()
+	config  := new(Config)
+	err := resourceconfig.Unmarshal(&config)
+	if err !=nil{
+		panic(err)
+	}
 	for {
 		for _, val := range objects {
+			var tclouddb Tcloud_db
 			switch val {
 			case "mysql":
-				mysql := new(Mysql)
-				instancelist := utils.GetMysqlInstance(resourceconfig)
+				tclouddb = new(Mysql)
+				//instancelist := utils.GetMysqlInstance(resourceconfig)
 				data := utils.GetMysqlMetrics(dataconfig)
 				for _, mysqlmetric := range data {
-					code := mysql.GetCode()
-					instancename := mysql.GetInstanceList(resourceconfig)
-					metric_chan <- MetricChannel{Apinamespace: code, MetricType: mysqlmetric, InstanceList: instancelist, InstanceName: instancename}
+					code := tclouddb.GetCode()
+					metric_chan <- MetricChannel{Apinamespace: code, MetricType: mysqlmetric, InstanceName: tclouddb, Config: config}
 
 				}
 			case "mongodb":
-				instancelist := utils.GetMongoInstance(resourceconfig)
+				tclouddb = new(Mongodb)
 				data := utils.GetMongoMetrics(dataconfig)
 				for _, mongometric := range data {
-					code := GetMongoCode()
-					instancename := GetMongoInstancename()
-					metric_chan <- MetricChannel{Apinamespace: code, MetricType: mongometric, InstanceList: instancelist, InstanceName: instancename}
+					code := tclouddb.GetCode()
+					metric_chan <- MetricChannel{Apinamespace: code, MetricType: mongometric, InstanceName: tclouddb, Config: config}
 				}
 			case "redis":
-				instancelist := utils.GetRedisInstance(resourceconfig)
+				tclouddb = new(Redis)
 				data := utils.GetRedisMetrics(dataconfig)
 				for _, mongometric := range data {
-					code := GetRedisCode()
-					instancename := GetRedisInstancename()
-					metric_chan <- MetricChannel{Apinamespace: code, MetricType: mongometric, InstanceList: instancelist, InstanceName: instancename}
+					code := tclouddb.GetCode()
+					metric_chan <- MetricChannel{Apinamespace: code, MetricType: mongometric, InstanceName: tclouddb, Config: config}
 				}
 			}
 		}
