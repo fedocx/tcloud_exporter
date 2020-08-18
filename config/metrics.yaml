@@ -29,5 +29,6 @@
 #  - Qw
 #  - Slavedelay
 redis:
-  - QpsMin
-  - CpuUsNodeMin
+  - CpuUsMin
+  - StorageMin
+  - StorageUsMin

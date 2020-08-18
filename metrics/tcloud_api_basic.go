@@ -19,7 +19,6 @@ import (
 	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common/profile"
 	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common/regions"
 	monitor "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/monitor/v20180724"
-	"tcloud_exporter/utils"
 )
 
 // struct for collector
@@ -51,7 +50,7 @@ func GetMetrics(client *monitor.Client, MetricCollector *MetricObj, value_temp M
 	request.MetricName = common.StringPtr(metrictype)
 	//request.Period = common.Uint64Ptr(300)
 	//设置采集时间
-	utils.SetTimeRange(request)
+	//utils.SetTimeRange(request)
 	// instance 设置
 
 	// print request delete
@@ -124,8 +123,9 @@ func AddInstance(request *monitor.GetMonitorDataRequest, instancelist []map[stri
 	list_instance := []*monitor.Instance{}
 	for _, str := range instancelist {
 		list_dimension := []*monitor.Dimension{}
+		var dimension *monitor.Dimension
 		for key,val := range str{
-			dimension := &monitor.Dimension{common.StringPtr(key), common.StringPtr(val)}
+			dimension = &monitor.Dimension{common.StringPtr(key), common.StringPtr(val)}
 			list_dimension = append(list_dimension, dimension)
 		}
 		instance := &monitor.Instance{list_dimension}
