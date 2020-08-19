@@ -3,3 +3,6 @@
   mysql:
     - yourinstanceid1
     - yourinstanceid2
+redis:
+- instanceid: crs-28wgf3u
+  clusterid: crs-28wgf3u

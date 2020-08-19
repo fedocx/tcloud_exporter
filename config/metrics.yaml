@@ -28,6 +28,7 @@ mysql:
 #  - Qr
 #  - Qw
 #  - Slavedelay
-#redis:
-#  - QpsMin
-#  - CpuUsNodeMin
+redis:
+  - CpuUsMin
+  - StorageMin
+  - StorageUsMin
