@@ -53,9 +53,9 @@ func (t *Mysql) AddInstance(request  *monitor.GetMonitorDataRequest, config *Con
 }
 
 func (t *Mysql)Rangeinstance(config *Config){
-	redis := config.Redis
-	typ := reflect.TypeOf(redis)
-	val := reflect.ValueOf(redis)
+	mysql := config.Mysql
+	typ := reflect.TypeOf(mysql)
+	val := reflect.ValueOf(mysqlt )
 	num := val.NumField()
 	for i:=0; i < num; i++{
 		tagVal := typ.Field(i).Tag.Get("json")

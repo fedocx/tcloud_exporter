@@ -1,5 +1,5 @@
-#mysql:
-#  - CPUUseRate
+mysql:
+  - CPUUseRate
 #  - MemoryUseRate
 #  - BytesSent
 #  - BytesReceived
@@ -28,6 +28,6 @@
 #  - Qr
 #  - Qw
 #  - Slavedelay
-redis:
-  - QpsMin
-  - CpuUsNodeMin
+#redis:
+#  - QpsMin
+#  - CpuUsNodeMin
