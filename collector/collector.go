@@ -35,7 +35,11 @@ func MetricsConsumer(metrics *metrics.MetricObj, dataconfig *viper.Viper){
 	MysqlRegister(metrics,dataconfig,object_gauge)
 	MongodbRegister(metrics,dataconfig,object_gauge)
 	RedisRegister(metrics,dataconfig,object_gauge)
+	KafkaPartitionRegister(metrics,dataconfig,object_gauge)
+	KafkaTopicRegister(metrics,dataconfig,object_gauge)
+
 	ReadMetrics(metrics,dataconfig,object_gauge)
+
 }
 
 // 定义监控指标，对于mysql采集哪些指标，并对这些指标进行注册。
@@ -89,6 +93,33 @@ func RedisRegister(metriccollector *metrics.MetricObj,dataconfig *viper.Viper,ob
 	object_gauge.Object["redis"] = append(object_gauge.Object["redis"],gauge_maps)
 }
 
+func KafkaTopicRegister(metriccollector *metrics.MetricObj,dataconfig *viper.Viper,object_gauge *Object_Gauge){
+	gauge_map := make(map[string]*prometheus.GaugeVec)
+	gauge_maps := new(Metric_Gauge)
+	gauge_maps.Gauge = gauge_map
+
+	mongodb_metrics := utils.GetKfakaTopicMetrics(dataconfig)
+	for _,val := range mongodb_metrics{
+		gauge_maps.Gauge[val] = Register("tcloud","database_kafka_topic",val,"Number of blob storage operations wa=itingto be processed.")
+		fmt.Println("kafka topic注册成功",val)
+
+	}
+	object_gauge.Object["kafka_topic"] = append(object_gauge.Object["kafka_topic"],gauge_maps)
+}
+
+func KafkaPartitionRegister(metriccollector *metrics.MetricObj,dataconfig *viper.Viper,object_gauge *Object_Gauge){
+	gauge_map := make(map[string]*prometheus.GaugeVec)
+	gauge_maps := new(Metric_Gauge)
+	gauge_maps.Gauge = gauge_map
+
+	mongodb_metrics := utils.GetKfakaPartitionMetrics(dataconfig)
+	for _,val := range mongodb_metrics{
+		gauge_maps.Gauge[val] = Register("tcloud","database_kafka_partition",val,"Number of blob storage operations wa=itingto be processed.")
+		fmt.Println("kafka partition注册成功",val)
+
+	}
+	object_gauge.Object["kafka_partition"] = append(object_gauge.Object["kafka_partition"],gauge_maps)
+}
 func ReadMetrics(metriccollector *metrics.MetricObj,dataconfig *viper.Viper,object_gauge *Object_Gauge){
 
 	// 休息10s钟，等接口从腾讯云获取完数据,存放到metriccollector之后再开始

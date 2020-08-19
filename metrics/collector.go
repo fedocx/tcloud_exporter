@@ -14,15 +14,12 @@ package metrics
 import (
 	"fmt"
 	"github.com/spf13/viper"
-	monitor "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/monitor/v20180724"
-	"tcloud_exporter/utils"
 	"time"
 )
 
 type Tcloud_db interface {
 	GetCode() string
-	Rangeinstance(config *Config)
-	AddInstance(request  *monitor.GetMonitorDataRequest, config *Config)
+	GetMetrics(dataconfig *viper.Viper) []string
 }
 
 type MetricChannel struct {
@@ -30,13 +27,16 @@ type MetricChannel struct {
 	MetricType   string
 	InstanceName  Tcloud_db
 	Config []map[string]string
+	Type string
 }
 
 type Config struct{
-	Mysql []map[string]string
-	Redis []map[string]string
-	Mongodb []map[string]string
-	Kafka []map[string]string
+	Mysql []map[string]string `mapstructure:"mysql"`
+	Redis []map[string]string `mapstructure:"redis"`
+	Mongodb []map[string]string `mapstructure:"mongodb"`
+	KafkaTopic []map[string]string `mapstructure:"kafka_topic"`
+	KafkaPartition []map[string]string `mapstructure:"kafka_partition"`
+
 }
 
 // 根据当前配置信息，获取配置里面的数据库项，并根据数据库项获取响应的数据库指标,通过goroutin方式执行
@@ -56,28 +56,45 @@ func GetResourceList(resourceconfig *viper.Viper, dataconfig *viper.Viper, metri
 			case "mysql":
 				tclouddb = new(Mysql)
 				//instancelist := utils.GetMysqlInstance(resourceconfig)
-				data := utils.GetMysqlMetrics(dataconfig)
+				data := tclouddb.GetMetrics(dataconfig)
 				for _, mysqlmetric := range data {
 					code := tclouddb.GetCode()
 					mysql_config := config.Mysql
-					metric_chan <- MetricChannel{Apinamespace: code, MetricType: mysqlmetric, InstanceName: tclouddb, Config: mysql_config}
+					metric_chan <- MetricChannel{Apinamespace: code, MetricType: mysqlmetric, InstanceName: tclouddb, Config: mysql_config,Type: val}
 
 				}
 			case "mongodb":
 				tclouddb = new(Mongodb)
-				data := utils.GetMongoMetrics(dataconfig)
+				data := tclouddb.GetMetrics(dataconfig)
 				for _, mongometric := range data {
 					code := tclouddb.GetCode()
 					mongodb_config := config.Mongodb
-					metric_chan <- MetricChannel{Apinamespace: code, MetricType: mongometric, InstanceName: tclouddb, Config: mongodb_config}
+					metric_chan <- MetricChannel{Apinamespace: code, MetricType: mongometric, InstanceName: tclouddb, Config: mongodb_config,Type: val}
 				}
 			case "redis":
 				tclouddb = new(Redis)
-				data := utils.GetRedisMetrics(dataconfig)
+				data := tclouddb.GetMetrics(dataconfig)
 				for _, mongometric := range data {
 					code := tclouddb.GetCode()
 					redis_config := config.Redis
-					metric_chan <- MetricChannel{Apinamespace: code, MetricType: mongometric, InstanceName: tclouddb, Config: redis_config}
+					metric_chan <- MetricChannel{Apinamespace: code, MetricType: mongometric, InstanceName: tclouddb, Config: redis_config,Type: val}
+				}
+			case "kafka_topic":
+				tclouddb = new(Kafka_topic)
+				data := tclouddb.GetMetrics(dataconfig)
+				for _, mongometric := range data {
+					code := tclouddb.GetCode()
+					kafka_config := config.KafkaTopic
+					//metric_chan <- MetricChannel{Apinamespace: code, MetricType: mongometric, InstanceName: tclouddb, Config: kafka_config}
+					metric_chan <- MetricChannel{Apinamespace: code, MetricType: mongometric, InstanceName: tclouddb, Config: kafka_config,Type: val}
+				}
+			case "kafka_partition":
+				tclouddb = new(Kafka_partition)
+				data := tclouddb.GetMetrics(dataconfig)
+				for _, mongometric := range data {
+					code := tclouddb.GetCode()
+					kafka_config := config.KafkaPartition
+					metric_chan <- MetricChannel{Apinamespace: code, MetricType: mongometric, InstanceName: tclouddb, Config: kafka_config,Type: val}
 				}
 			}
 		}
@@ -88,6 +105,11 @@ func GetResourceList(resourceconfig *viper.Viper, dataconfig *viper.Viper, metri
 
 // 调度器，用于控制腾讯云接口访问频率
 func Dispatch(id, key string, metric_chan chan MetricChannel, MetricCollector *MetricObj) {
+	lock := make(chan int,10)
+	// init lock
+	for i:=0; i< 10; i ++ {
+		lock <- i
+	}
 
 	// 获取client
 	client := GetClient(id, key)
@@ -95,39 +117,39 @@ func Dispatch(id, key string, metric_chan chan MetricChannel, MetricCollector *M
 		//value_temp := <- metric_chan
 		for i := 0; i <= 10; i++ {
 			fmt.Println("执行指标采集", i)
-			GetMetrics(client, MetricCollector, <-metric_chan)
+			go GetMetrics(client, MetricCollector, <-metric_chan,lock)
 		}
 		time.Sleep(time.Second * 1)
 	}
 }
 
-func NamespaceToNameMap(namespace string) string {
-	var name string
-	switch namespace {
-	case "QCE/CMONGO":
-		name = "mongodb"
-	case "QCE/CDB":
-		name = "mysql"
-	case "QCE/REDIS":
-		name = "redis"
-	default:
-		name = "unknown"
-	}
-	return name
-
-}
-
-func NameToNamespaceMap(name string) string {
-	var namespace string
-	switch name {
-	case "mysql":
-		namespace = "QCE/CDB"
-	case "mongodb":
-		namespace = "QCE/CMONGO"
-	case "redis":
-		namespace = "QCE/REDIS"
-	default:
-		namespace = "unknown"
-	}
-	return namespace
-}
+//func NamespaceToNameMap(namespace string) string {
+//	var name string
+//	switch namespace {
+//	case "QCE/CMONGO":
+//		name = "mongodb"
+//	case "QCE/CDB":
+//		name = "mysql"
+//	case "QCE/REDIS":
+//		name = "redis"
+//	default:
+//		name = "unknown"
+//	}
+//	return name
+//
+//}
+//
+//func NameToNamespaceMap(name string) string {
+//	var namespace string
+//	switch name {
+//	case "mysql":
+//		namespace = "QCE/CDB"
+//	case "mongodb":
+//		namespace = "QCE/CMONGO"
+//	case "redis":
+//		namespace = "QCE/REDIS"
+//	default:
+//		namespace = "unknown"
+//	}
+//	return namespace
+//}

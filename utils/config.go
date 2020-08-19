@@ -38,3 +38,12 @@ func GetRedisMetrics(dataconfig *viper.Viper) []string {
 	redis := dataconfig.GetStringSlice("redis")
 	return redis
 }
+
+func GetKfakaTopicMetrics(dataconfig *viper.Viper) []string {
+	redis := dataconfig.GetStringSlice("kafka_topic")
+	return redis
+}
+func GetKfakaPartitionMetrics(dataconfig *viper.Viper) []string {
+	redis := dataconfig.GetStringSlice("kafka_partition")
+	return redis
+}

@@ -11,11 +11,7 @@
 // limitations under the License.
 package metrics
 
-import (
-	"fmt"
-	monitor "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/monitor/v20180724"
-	"reflect"
-)
+import "github.com/spf13/viper"
 
 type Redis struct {
 }
@@ -30,40 +26,6 @@ func (t *Redis) GetCode() string {
 	return "QCE/REDIS"
 }
 
-//func (t *Redis)GetInstancename()string{
-//	//return "InstanceId"
-//	return "instanceid"
-//}
-//func (t *Redis) GetInstanceList(config *Config) []Redis_instance{
-//	return config.Redis
-//}
-
-func (t *Redis) AddInstance(request  *monitor.GetMonitorDataRequest, config *Config){
-	list_instance := []*monitor.Instance{}
-	t.Rangeinstance(config)
-	//for _, str := range config.Kafka {
-	//	list_dimension := []*monitor.Dimension{}
-	//	for key,val := range str{
-	//		dimension := &monitor.Dimension{common.StringPtr(key), common.StringPtr(val)}
-	//		list_dimension = append(list_dimension, dimension)
-	//	}
-	//	instance := &monitor.Instance{list_dimension}
-	//	list_instance = append(list_instance, instance)
-	//
-	//}
-	request.Instances = list_instance
-}
-
-func (t *Redis)Rangeinstance(config *Config){
-	redis := config.Redis
-	typ := reflect.TypeOf(redis)
-	val := reflect.ValueOf(redis)
-	num := val.NumField()
-	for i:=0; i < num; i++{
-		tagVal := typ.Field(i).Tag.Get("json")
-		if tagVal != ""{
-			fmt.Println(i,tagVal,val.Field(i))
-		}
-	}
-
+func(t *Redis) GetMetrics(dataconfig *viper.Viper) []string{
+	return dataconfig.GetStringSlice("redis")
 }

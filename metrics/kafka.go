@@ -11,55 +11,29 @@
 // limitations under the License.
 package metrics
 
-import (
-	"fmt"
-	monitor "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/monitor/v20180724"
-	"reflect"
-)
+import "github.com/spf13/viper"
 
-type Kafka struct {
+type Kafka_topic struct {
 }
 
-type Kafka_instance struct{
-	ConsumerGroup string
+func (t *Kafka_topic) GetCode() string {
+	return "QCE/CKAFKA"
 }
-func (t *Kafka) GetCode() string {
+func(t *Kafka_topic) GetMetrics(dataconfig *viper.Viper) []string{
+	return dataconfig.GetStringSlice("kafka_topic")
+}
+
+
+
+type Kafka_partition struct {
+}
+
+func (t *Kafka_partition) GetCode() string {
 	return "QCE/CKAFKA"
 }
 
-//func (t *Kafka)GetInstancename()string{
-//	return "consumerGroup"
-//}
-//func (t *Kafka) GetInstanceList(config *Config) []Kafka_instance{
-//	return config.Kafka
-//}
-
-func (t *Kafka) AddInstance(request  *monitor.GetMonitorDataRequest, config *Config){
-	list_instance := []*monitor.Instance{}
-	t.Rangeinstance(config)
-	//for _, str := range config.Kafka {
-	//	list_dimension := []*monitor.Dimension{}
-	//	for key,val := range str{
-	//		dimension := &monitor.Dimension{common.StringPtr(key), common.StringPtr(val)}
-	//		list_dimension = append(list_dimension, dimension)
-	//	}
-	//	instance := &monitor.Instance{list_dimension}
-	//	list_instance = append(list_instance, instance)
-	//
-	//}
-	request.Instances = list_instance
-}
-
-func (t *Kafka)Rangeinstance(config *Config){
-	redis := config.Redis
-	typ := reflect.TypeOf(redis)
-	val := reflect.ValueOf(redis)
-	num := val.NumField()
-	for i:=0; i < num; i++{
-		tagVal := typ.Field(i).Tag.Get("json")
-		if tagVal != ""{
-			fmt.Println(i,tagVal,val.Field(i))
-		}
-	}
+func(t *Kafka_partition) GetMetrics(dataconfig *viper.Viper) []string{
+	return dataconfig.GetStringSlice("kafka_partition")
 
 }
+

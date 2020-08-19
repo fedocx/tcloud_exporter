@@ -19,6 +19,7 @@ import (
 	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common/profile"
 	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common/regions"
 	monitor "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/monitor/v20180724"
+	"tcloud_exporter/utils"
 )
 
 // struct for collector
@@ -38,19 +39,21 @@ type MetricObj struct {
 }
 
 
-func GetMetrics(client *monitor.Client, MetricCollector *MetricObj, value_temp MetricChannel) {
+func GetMetrics(client *monitor.Client, MetricCollector *MetricObj, value_temp MetricChannel,lock chan int) {
+	<- lock
 	//参数初始化
 	apinamespace := value_temp.Apinamespace
 	metrictype := value_temp.MetricType
+	objecttype := value_temp.Type
 	//instancename := value_temp.InstanceName
 	config := value_temp.Config
 	// 创建并设置请求参数
 	request := monitor.NewGetMonitorDataRequest()
 	request.Namespace = common.StringPtr(apinamespace)
 	request.MetricName = common.StringPtr(metrictype)
-	//request.Period = common.Uint64Ptr(300)
+	request.Period = common.Uint64Ptr(300)
 	//设置采集时间
-	//utils.SetTimeRange(request)
+	utils.SetTimeRange(request)
 	// instance 设置
 
 	// print request delete
@@ -69,7 +72,8 @@ func GetMetrics(client *monitor.Client, MetricCollector *MetricObj, value_temp M
 	if err != nil {
 		panic(err)
 	}
-	FormatMetrics(apinamespace,response, MetricCollector)
+	FormatMetrics(objecttype,response, MetricCollector)
+	lock <- 1
 }
 
 // 客户端配置对象
@@ -98,7 +102,7 @@ func FormatMetrics(productname string,response *monitor.GetMonitorDataResponse, 
 		instanceid := *i.Dimensions[0].Value
 		var value float64
 		if len(i.Values) > 0 {
-			value = *i.Values[0]
+			value = *i.Values[len(i.Values) -1]
 		} else {
 			continue
 		}
@@ -112,7 +116,7 @@ func FormatMetrics(productname string,response *monitor.GetMonitorDataResponse, 
 
 
 	Metrics.Metrics[*response.Response.MetricName] = datas
-	productname = NamespaceToNameMap(productname)
+	//productname = NamespaceToNameMap(productname)
 	MetricCollector.Products[productname] = append(MetricCollector.Products[productname],Metrics)
 	//MetricCollector.Products[productname].[*response.Response.MetricName] = datas
 	//fmt.Println(MetricCollector.Products)

@@ -12,11 +12,7 @@
 
 package metrics
 
-import (
-	"fmt"
-	monitor "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/monitor/v20180724"
-	"reflect"
-)
+import "github.com/spf13/viper"
 
 type Mysql struct {
 }
@@ -30,38 +26,6 @@ func (t *Mysql) GetCode() string {
 	return "QCE/CDB"
 }
 
-//func (t *Mysql)GetInstancename()string{
-//	return "InstanceId"
-//}
-//func (t *Mysql) GetInstanceList(config *Config) []Mysql_instance{
-//	return config.Mysql
-//}
-func (t *Mysql) AddInstance(request  *monitor.GetMonitorDataRequest, config *Config){
-	list_instance := []*monitor.Instance{}
-	t.Rangeinstance(config)
-	//for _, str := range config.Kafka {
-	//	list_dimension := []*monitor.Dimension{}
-	//	for key,val := range str{
-	//		dimension := &monitor.Dimension{common.StringPtr(key), common.StringPtr(val)}
-	//		list_dimension = append(list_dimension, dimension)
-	//	}
-	//	instance := &monitor.Instance{list_dimension}
-	//	list_instance = append(list_instance, instance)
-	//
-	//}
-	request.Instances = list_instance
-}
-
-func (t *Mysql)Rangeinstance(config *Config){
-	mysql := config.Mysql
-	typ := reflect.TypeOf(mysql)
-	val := reflect.ValueOf(mysqlt )
-	num := val.NumField()
-	for i:=0; i < num; i++{
-		tagVal := typ.Field(i).Tag.Get("json")
-		if tagVal != ""{
-			fmt.Println(i,tagVal,val.Field(i))
-		}
-	}
-
+func(t *Mysql) GetMetrics(dataconfig *viper.Viper) []string{
+	return dataconfig.GetStringSlice("mysql")
 }
