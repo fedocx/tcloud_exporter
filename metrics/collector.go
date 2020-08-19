@@ -117,7 +117,7 @@ func Dispatch(id, key string, metric_chan chan MetricChannel, MetricCollector *M
 		//value_temp := <- metric_chan
 		for i := 0; i <= 10; i++ {
 			fmt.Println("执行指标采集", i)
-			go GetMetrics(client, MetricCollector, <-metric_chan,lock)
+			go GetMetrics(client, MetricCollector, <-metric_chan)
 		}
 		time.Sleep(time.Second * 1)
 	}

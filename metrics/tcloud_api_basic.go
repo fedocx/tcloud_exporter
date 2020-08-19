@@ -39,7 +39,7 @@ type MetricObj struct {
 }
 
 
-func GetMetrics(client *monitor.Client, MetricCollector *MetricObj, value_temp MetricChannel,lock chan int) {
+func GetMetrics(client *monitor.Client, MetricCollector *MetricObj, value_temp MetricChannel) {
 	<- lock
 	//参数初始化
 	apinamespace := value_temp.Apinamespace
