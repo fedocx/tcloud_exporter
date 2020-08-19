@@ -107,7 +107,7 @@ func GetResourceList(resourceconfig *viper.Viper, dataconfig *viper.Viper, metri
 func Dispatch(id, key string, metric_chan chan MetricChannel, MetricCollector *MetricObj) {
 	lock := make(chan int,10)
 	// init lock
-	for i:=0; i< 10; i ++ {
+	for i:=1; i< 11; i ++ {
 		lock <- i
 	}
 
@@ -117,9 +117,9 @@ func Dispatch(id, key string, metric_chan chan MetricChannel, MetricCollector *M
 		//value_temp := <- metric_chan
 		for i := 0; i <= 10; i++ {
 			fmt.Println("执行指标采集", i)
-			go GetMetrics(client, MetricCollector, <-metric_chan)
+			go GetMetrics(client, MetricCollector, <-metric_chan,lock)
 		}
-		time.Sleep(time.Second * 1)
+		time.Sleep(time.Second * 2)
 	}
 }
 

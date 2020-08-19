@@ -1,31 +1,31 @@
-#mysql:
-#  - CPUUseRate
-#  - MemoryUseRate
-#  - BytesSent
-#  - BytesReceived
-#  - VolumeRate
-#  - QPS
-#  - MaxConnections
-#  - ThreadsConnected
-#  - SlowQueries
-#  - Queries
-#  - SelectScan
-#  - MasterSlaveSyncDistance
-#  - SecondsBehindMaster
-#  - InnodbCacheUseRate
-#  - InnodbCacheHitRate
-#  - KeyCacheUseRate
-#  - KeyCacheHitRate
-#  - ComCommit
-#  - ComRollback
-#  - ThreadsRunning
-#mongodb:
-#  - Netin
-#  - Netout
-#  - Cpuusage
-#  - Memusage
-#  - Qr
-#  - Qw
+mysql:
+  - CPUUseRate
+  - MemoryUseRate
+  - BytesSent
+  - BytesReceived
+  - VolumeRate
+  - QPS
+  - MaxConnections
+  - ThreadsConnected
+  - SlowQueries
+  - Queries
+  - SelectScan
+  - MasterSlaveSyncDistance
+  - SecondsBehindMaster
+  - InnodbCacheUseRate
+  - InnodbCacheHitRate
+  - KeyCacheUseRate
+  - KeyCacheHitRate
+  - ComCommit
+  - ComRollback
+  - ThreadsRunning
+mongodb:
+  - Netin
+  - Netout
+  - Cpuusage
+  - Memusage
+  - Qr
+  - Qw
 redis:
   - CpuUsMin
   - StorageMin
@@ -53,17 +53,17 @@ redis:
   - StatMissedMin
   - CmdErrMin
   - CacheHitRatioMin
-#kafka_topic:
-#  - CtopicProFlow
-#  - CtopicConFlow
-#  - CtopicMsgHeap
-#  - CtopicProCount
-#  - CtopicProReqCount
-#  - CtopicConReqCount
-#  - CtopicMsgCount
-#  - CtopicConCount
-#kafka_partition:
-#  - CgroupMaxOffset
-#  - CtopicMsgOffset
-#  - CtopicUnconsumeMsgCount
-#  - CtopicUnconsumeMsgOffset
+kafka_topic:
+  - CtopicProFlow
+  - CtopicConFlow
+  - CtopicMsgHeap
+  - CtopicProCount
+  - CtopicProReqCount
+  - CtopicConReqCount
+  - CtopicMsgCount
+  - CtopicConCount
+kafka_partition:
+  - CgroupMaxOffset
+  - CtopicMsgOffset
+  - CtopicUnconsumeMsgCount
+  - CtopicUnconsumeMsgOffset
