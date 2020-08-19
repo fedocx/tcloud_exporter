@@ -1,71 +1,69 @@
-mysql:
-  - CPUUseRate
-  - MemoryUseRate
-  - BytesSent
-  - BytesReceived
-  - VolumeRate
-  - QPS
-  - MaxConnections
-  - ThreadsConnected
-  - SlowQueries
-  - Queries
-  - SelectScan
-  - MasterSlaveSyncDistance
-  - SecondsBehindMaster
-  - InnodbCacheUseRate
-  - InnodbCacheHitRate
-  - KeyCacheUseRate
-  - KeyCacheHitRate
-  - ComCommit
-  - ComRollback
-  - ThreadsRunning
+#mysql:
+#  - CPUUseRate
+#  - MemoryUseRate
+#  - BytesSent
+#  - BytesReceived
+#  - VolumeRate
+#  - QPS
+#  - MaxConnections
+#  - ThreadsConnected
+#  - SlowQueries
+#  - Queries
+#  - SelectScan
+#  - MasterSlaveSyncDistance
+#  - SecondsBehindMaster
+#  - InnodbCacheUseRate
+#  - InnodbCacheHitRate
+#  - KeyCacheUseRate
+#  - KeyCacheHitRate
+#  - ComCommit
+#  - ComRollback
+#  - ThreadsRunning
 mongodb:
   - Netin
   - Netout
   - Cpuusage
   - Memusage
-  - Conn
   - Qr
   - Qw
-  - Slavedelay
-redis:
-  - CpuUsMin
-  - StorageMin
-  - StorageUsMin
-  - KeysMin
-  - ExpiredKeysMin
-  - EvictedKeysMin
-  - ConnectionsMin
-  - ConnectionsUsMin
-  - InFlowMin
-  - InFlowUsMin
-  - OutFlowMin
-  - OutFlowUsMin
-  - LatencyMin
-  - LatencyGetMin
-  - LatencySetMin
-  - LatencyOtherMin
-  - QpsMin
-  - StatGetMin
-  - StatSetMin
-  - StatOtherMin
-  - BigValueMin
-  - SlowQueryMin
-  - StatSuccessMin
-  - StatMissedMin
-  - CmdErrMin
-  - CacheHitRatioMin
-kafka_topic:
-  - CtopicProFlow
-  - CtopicConFlow
-  - CtopicMsgHeap
-  - CtopicProCount
-  - CtopicProReqCount
-  - CtopicConReqCount
-  - CtopicMsgCount
-  - CtopicConCount
-kafka_partition:
-  - CgroupMaxOffset
-  - CtopicMsgOffset
-  - CtopicUnconsumeMsgCount
-  - CtopicUnconsumeMsgOffset
+#redis:
+#  - CpuUsMin
+#  - StorageMin
+#  - StorageUsMin
+#  - KeysMin
+#  - ExpiredKeysMin
+#  - EvictedKeysMin
+#  - ConnectionsMin
+#  - ConnectionsUsMin
+#  - InFlowMin
+#  - InFlowUsMin
+#  - OutFlowMin
+#  - OutFlowUsMin
+#  - LatencyMin
+#  - LatencyGetMin
+#  - LatencySetMin
+#  - LatencyOtherMin
+#  - QpsMin
+#  - StatGetMin
+#  - StatSetMin
+#  - StatOtherMin
+#  - BigValueMin
+#  - SlowQueryMin
+#  - StatSuccessMin
+#  - StatMissedMin
+#  - CmdErrMin
+#  - CacheHitRatioMin
+#kafka_topic:
+#  - CtopicProFlow
+#  - CtopicConFlow
+#  - CtopicMsgHeap
+#  - CtopicProCount
+#  - CtopicProReqCount
+#  - CtopicConReqCount
+#  - CtopicMsgCount
+#  - CtopicConCount
+#kafka_partition:
+#  - CgroupMaxOffset
+#  - CtopicMsgOffset
+#  - CtopicUnconsumeMsgCount
+#  - CtopicUnconsumeMsgOffset
