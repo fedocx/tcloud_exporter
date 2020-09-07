@@ -38,10 +38,9 @@ func MetricsConsumer(metrics *metrics.MetricObj, dataconfig *viper.Viper,flush_m
 	KafkaPartitionRegister(metrics,dataconfig,object_gauge)
 	KafkaTopicRegister(metrics,dataconfig,object_gauge)
 
-	if <-flush_metrics{
-		ReadMetrics(metrics,dataconfig,object_gauge)
+	ReadMetrics(metrics,dataconfig,object_gauge, flush_metrics)
 
-	}
+	//}
 
 }
 
@@ -123,7 +122,7 @@ func KafkaPartitionRegister(metriccollector *metrics.MetricObj,dataconfig *viper
 	}
 	object_gauge.Object["kafka_partition"] = append(object_gauge.Object["kafka_partition"],gauge_maps)
 }
-func ReadMetrics(metriccollector *metrics.MetricObj,dataconfig *viper.Viper,object_gauge *Object_Gauge){
+func ReadMetrics(metriccollector *metrics.MetricObj,dataconfig *viper.Viper,object_gauge *Object_Gauge,flush_metrics chan bool){
 
 	// 休息10s钟，等接口从腾讯云获取完数据,存放到metriccollector之后再开始
 	time.Sleep(time.Second * 10)
@@ -132,13 +131,15 @@ func ReadMetrics(metriccollector *metrics.MetricObj,dataconfig *viper.Viper,obje
 	//name := metrics.NamespaceToNameMap(namespace)
 	// key mysql
 	for {
-		for key,val := range object_gauge.Object{
-			log.Print("再次更新数据",key)
-			for _,vec := range val{
-				// metric_name : netin   metric_value 123
-				for metric_name,metric_value := range vec.Gauge{
-					GetGuage(metric_name,metric_value,metriccollector,key)
+		if <-flush_metrics {
+			for key, val := range object_gauge.Object {
+				log.Print("再次更新数据", key)
+				for _, vec := range val {
+					// metric_name : netin   metric_value 123
+					for metric_name, metric_value := range vec.Gauge {
+						GetGuage(metric_name, metric_value, metriccollector, key)
 
+					}
 				}
 			}
 		}

@@ -13,6 +13,7 @@ package metrics
 
 import (
 	"github.com/spf13/viper"
+	"log"
 	"time"
 )
 
@@ -51,6 +52,7 @@ func GetResourceList(resourceconfig *viper.Viper, dataconfig *viper.Viper, metri
 	for {
 		for _, val := range objects {
 			var tclouddb Tcloud_db
+			log.Print(val)
 			switch val {
 			case "mysql":
 				tclouddb = new(Mysql)
@@ -97,8 +99,11 @@ func GetResourceList(resourceconfig *viper.Viper, dataconfig *viper.Viper, metri
 				}
 			}
 		}
+
 		flush_metrics <- true
+		log.Print("开始休息60秒 ")
 		time.Sleep(time.Second * 60)
+		log.Print("已完成休息60秒 ")
 
 	}
 }
