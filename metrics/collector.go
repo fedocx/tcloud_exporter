@@ -12,7 +12,6 @@
 package metrics
 
 import (
-	"fmt"
 	"github.com/spf13/viper"
 	"time"
 )
@@ -40,7 +39,7 @@ type Config struct{
 }
 
 // 根据当前配置信息，获取配置里面的数据库项，并根据数据库项获取响应的数据库指标,通过goroutin方式执行
-func GetResourceList(resourceconfig *viper.Viper, dataconfig *viper.Viper, metric_chan chan MetricChannel) {
+func GetResourceList(resourceconfig *viper.Viper, dataconfig *viper.Viper, metric_chan chan MetricChannel,flush_metrics chan bool) {
 
 	// 获取配置文件采集项
 	objects := dataconfig.AllKeys()
@@ -98,6 +97,7 @@ func GetResourceList(resourceconfig *viper.Viper, dataconfig *viper.Viper, metri
 				}
 			}
 		}
+		flush_metrics <- true
 		time.Sleep(time.Second * 60)
 
 	}
@@ -116,7 +116,6 @@ func Dispatch(id, key string, metric_chan chan MetricChannel, MetricCollector *M
 	for {
 		//value_temp := <- metric_chan
 		for i := 0; i <= 10; i++ {
-			fmt.Println("执行指标采集", i)
 			go GetMetrics(client, MetricCollector, <-metric_chan,lock)
 		}
 		time.Sleep(time.Second * 2)

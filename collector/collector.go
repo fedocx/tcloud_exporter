@@ -12,9 +12,9 @@
 package collector
 
 import (
-	"fmt"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/spf13/viper"
+	"log"
 	"tcloud_exporter/metrics"
 	"tcloud_exporter/utils"
 	"time"
@@ -28,7 +28,7 @@ type Object_Gauge struct{
 }
 
 // 消费指标
-func MetricsConsumer(metrics *metrics.MetricObj, dataconfig *viper.Viper){
+func MetricsConsumer(metrics *metrics.MetricObj, dataconfig *viper.Viper,flush_metrics chan bool){
 	gauge_maps := make(map[string][]*Metric_Gauge)
 	object_gauge := new(Object_Gauge)
 	object_gauge.Object = gauge_maps
@@ -38,7 +38,10 @@ func MetricsConsumer(metrics *metrics.MetricObj, dataconfig *viper.Viper){
 	KafkaPartitionRegister(metrics,dataconfig,object_gauge)
 	KafkaTopicRegister(metrics,dataconfig,object_gauge)
 
-	ReadMetrics(metrics,dataconfig,object_gauge)
+	if <-flush_metrics{
+		ReadMetrics(metrics,dataconfig,object_gauge)
+
+	}
 
 }
 
@@ -87,7 +90,7 @@ func RedisRegister(metriccollector *metrics.MetricObj,dataconfig *viper.Viper,ob
 	mongodb_metrics := utils.GetRedisMetrics(dataconfig)
 	for _,val := range mongodb_metrics{
 		gauge_maps.Gauge[val] = Register("tcloud","database_redis",val,"Number of blob storage operations wa=itingto be processed.")
-		fmt.Println("redis注册成功",val)
+		log.Print("redis注册成功",val)
 
 	}
 	object_gauge.Object["redis"] = append(object_gauge.Object["redis"],gauge_maps)
@@ -101,7 +104,7 @@ func KafkaTopicRegister(metriccollector *metrics.MetricObj,dataconfig *viper.Vip
 	mongodb_metrics := utils.GetKfakaTopicMetrics(dataconfig)
 	for _,val := range mongodb_metrics{
 		gauge_maps.Gauge[val] = Register("tcloud","database_kafka_topic",val,"Number of blob storage operations wa=itingto be processed.")
-		fmt.Println("kafka topic注册成功",val)
+		log.Print("kafka topic注册成功",val)
 
 	}
 	object_gauge.Object["kafka_topic"] = append(object_gauge.Object["kafka_topic"],gauge_maps)
@@ -115,7 +118,7 @@ func KafkaPartitionRegister(metriccollector *metrics.MetricObj,dataconfig *viper
 	mongodb_metrics := utils.GetKfakaPartitionMetrics(dataconfig)
 	for _,val := range mongodb_metrics{
 		gauge_maps.Gauge[val] = Register("tcloud","database_kafka_partition",val,"Number of blob storage operations wa=itingto be processed.")
-		fmt.Println("kafka partition注册成功",val)
+		log.Print("kafka partition注册成功",val)
 
 	}
 	object_gauge.Object["kafka_partition"] = append(object_gauge.Object["kafka_partition"],gauge_maps)
@@ -130,7 +133,7 @@ func ReadMetrics(metriccollector *metrics.MetricObj,dataconfig *viper.Viper,obje
 	// key mysql
 	for {
 		for key,val := range object_gauge.Object{
-			fmt.Println("再次更新数据",key)
+			log.Print("再次更新数据",key)
 			for _,vec := range val{
 				// metric_name : netin   metric_value 123
 				for metric_name,metric_value := range vec.Gauge{

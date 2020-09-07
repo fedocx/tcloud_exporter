@@ -62,13 +62,14 @@ func main() {
 
 	// 生成channel，用于对指标进行消费
 	var metric_channel = make(chan metrics.MetricChannel,10)
+	var flush_metrics = make(chan bool)
 
 
-	go metrics.GetResourceList(resourceconfig,dataconfig, metric_channel)
+	go metrics.GetResourceList(resourceconfig,dataconfig, metric_channel,flush_metrics)
 	// 消费指标，从腾讯云获取监控数据，并将指标存放到MetricCollector列表中
 	go metrics.Dispatch(TENCENTCLOUD_SECRET_ID, TENCENTCLOUD_SECRET_KEY,  metric_channel, MetricCollector)
 
-	go collector.MetricsConsumer(MetricCollector,dataconfig)
+	go collector.MetricsConsumer(MetricCollector,dataconfig,flush_metrics)
 
 
 	flag.Parse()
