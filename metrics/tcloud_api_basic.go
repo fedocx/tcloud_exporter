@@ -50,7 +50,7 @@ func GetMetrics(client *monitor.Client, MetricCollector *MetricObj, value_temp M
 	config := value_temp.Config
 
 	// log
-	log.Print("开始采集:", objecttype, "    ",metrictype )
+	//log.Print("开始采集:", objecttype, "    ",metrictype )
 	// 创建并设置请求参数
 	request := monitor.NewGetMonitorDataRequest()
 	request.Namespace = common.StringPtr(apinamespace)
@@ -120,7 +120,7 @@ func FormatMetrics(productname string,response *monitor.GetMonitorDataResponse, 
 
 
 	Metrics.Metrics[*response.Response.MetricName] = datas
-	log.Print("采集到数据:", metrics, ":",datas)
+	log.Print("采集到数据:", metrics, ":",datas[0].Key,"   value:",datas[0].Value)
 	//productname = NamespaceToNameMap(productname)
 	MetricCollector.Products[productname] = append(MetricCollector.Products[productname],Metrics)
 	//MetricCollector.Products[productname].[*response.Response.MetricName] = datas
