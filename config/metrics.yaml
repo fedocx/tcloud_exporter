@@ -1,24 +1,38 @@
 mysql:
   - CPUUseRate
   - MemoryUseRate
+  - MemoryUse
   - BytesSent
   - BytesReceived
   - VolumeRate
+  - RealCapacity
   - QPS
+  - TPS
   - MaxConnections
   - ThreadsConnected
+  - ThreadsRunning
   - SlowQueries
   - Queries
+  - QueryRate
   - SelectScan
-  - MasterSlaveSyncDistance
-  - SecondsBehindMaster
-  - InnodbCacheUseRate
-  - InnodbCacheHitRate
-  - KeyCacheUseRate
-  - KeyCacheHitRate
+  - SelectCount
+  - ComUpdate
+  - ComDelete
+  - ComInsert
+  - ComReplace
   - ComCommit
   - ComRollback
-  - ThreadsRunning
+  - TableLocksWaited
+  - InnodbCacheUseRate
+  - InnodbCacheHitRate
+  - InnodbOsFileReads
+  - InnodbOsFileWrites
+  - InnodbOsFsyncs
+  - InnodbNumOpenFiles
+  - KeyCacheUseRate
+  - KeyCacheHitRate
+  - MasterSlaveSyncDistance
+  - SecondsBehindMaster
 mongodb:
   - Netin
   - Netout

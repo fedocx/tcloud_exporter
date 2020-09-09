@@ -71,6 +71,7 @@ func GetMetrics(client *monitor.Client, MetricCollector *MetricObj, value_temp M
 	if _, ok := err.(*errors.TencentCloudSDKError); ok {
 		fmt.Println(*request.Namespace,*request.MetricName,*request.Instances[0].Dimensions[0])
 		fmt.Printf("An API error has returned : %s", err)
+		lock <- 1
 		return
 	}
 	if err != nil {
