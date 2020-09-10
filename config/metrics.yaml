@@ -1,45 +1,45 @@
-#mysql:
-#  - CPUUseRate
-#  - MemoryUseRate
-#  - MemoryUse
-#  - BytesSent
-#  - BytesReceived
-#  - VolumeRate
-#  - RealCapacity
-#  - QPS
-#  - TPS
-#  - MaxConnections
-#  - ThreadsConnected
-#  - ThreadsRunning
-#  - SlowQueries
-#  - Queries
-#  - QueryRate
-#  - SelectScan
-#  - SelectCount
-#  - ComUpdate
-#  - ComDelete
-#  - ComInsert
-#  - ComReplace
-#  - ComCommit
-#  - ComRollback
-#  - TableLocksWaited
-#  - InnodbCacheUseRate
-#  - InnodbCacheHitRate
-#  - InnodbOsFileReads
-#  - InnodbOsFileWrites
-#  - InnodbOsFsyncs
-#  - InnodbNumOpenFiles
-#  - KeyCacheUseRate
-#  - KeyCacheHitRate
-#  - MasterSlaveSyncDistance
-#  - SecondsBehindMaster
-#mongodb:
-#  - Netin
-#  - Netout
-#  - Cpuusage
-#  - Memusage
-#  - Qr
-#  - Qw
+mysql:
+  - CPUUseRate
+  - MemoryUseRate
+  - MemoryUse
+  - BytesSent
+  - BytesReceived
+  - VolumeRate
+  - RealCapacity
+  - QPS
+  - TPS
+  - MaxConnections
+  - ThreadsConnected
+  - ThreadsRunning
+  - SlowQueries
+  - Queries
+  - QueryRate
+  - SelectScan
+  - SelectCount
+  - ComUpdate
+  - ComDelete
+  - ComInsert
+  - ComReplace
+  - ComCommit
+  - ComRollback
+  - TableLocksWaited
+  - InnodbCacheUseRate
+  - InnodbCacheHitRate
+  - InnodbOsFileReads
+  - InnodbOsFileWrites
+  - InnodbOsFsyncs
+  - InnodbNumOpenFiles
+  - KeyCacheUseRate
+  - KeyCacheHitRate
+  - MasterSlaveSyncDistance
+  - SecondsBehindMaster
+mongodb:
+  - Netin
+  - Netout
+  - Cpuusage
+  - Memusage
+  - Qr
+  - Qw
 mongodb_cluster:
   - Inserts
   - Reads
@@ -59,44 +59,44 @@ mongodb_replication:
   - ReplicaDiskusage
   - Slavedelay
   - Oplogreservedtime
-#redis:
-#  - CpuUsMin
-#  - StorageMin
-#  - StorageUsMin
-#  - KeysMin
-#  - ExpiredKeysMin
-#  - EvictedKeysMin
-#  - ConnectionsMin
-#  - ConnectionsUsMin
-#  - InFlowMin
-#  - InFlowUsMin
-#  - OutFlowMin
-#  - OutFlowUsMin
-#  - LatencyMin
-#  - LatencyGetMin
-#  - LatencySetMin
-#  - LatencyOtherMin
-#  - QpsMin
-#  - StatGetMin
-#  - StatSetMin
-#  - StatOtherMin
-#  - BigValueMin
-#  - SlowQueryMin
-#  - StatSuccessMin
-#  - StatMissedMin
-#  - CmdErrMin
-#  - CacheHitRatioMin
-#kafka_topic:
-#  - CtopicProFlow
-#  - CtopicConFlow
-#  - CtopicMsgHeap
-#  - CtopicProCount
-#  - CtopicProReqCount
-#  - CtopicConReqCount
-#  - CtopicMsgCount
-#  - CtopicConCount
-#kafka_partition:
-#  - CgroupMaxOffset
-#  - CtopicMsgOffset
-#  - CtopicUnconsumeMsgCount
-#  - CtopicUnconsumeMsgOffset
+redis:
+  - CpuUsMin
+  - StorageMin
+  - StorageUsMin
+  - KeysMin
+  - ExpiredKeysMin
+  - EvictedKeysMin
+  - ConnectionsMin
+  - ConnectionsUsMin
+  - InFlowMin
+  - InFlowUsMin
+  - OutFlowMin
+  - OutFlowUsMin
+  - LatencyMin
+  - LatencyGetMin
+  - LatencySetMin
+  - LatencyOtherMin
+  - QpsMin
+  - StatGetMin
+  - StatSetMin
+  - StatOtherMin
+  - BigValueMin
+  - SlowQueryMin
+  - StatSuccessMin
+  - StatMissedMin
+  - CmdErrMin
+  - CacheHitRatioMin
+kafka_topic:
+  - CtopicProFlow
+  - CtopicConFlow
+  - CtopicMsgHeap
+  - CtopicProCount
+  - CtopicProReqCount
+  - CtopicConReqCount
+  - CtopicMsgCount
+  - CtopicConCount
+kafka_partition:
+  - CgroupMaxOffset
+  - CtopicMsgOffset
+  - CtopicUnconsumeMsgCount
+  - CtopicUnconsumeMsgOffset
