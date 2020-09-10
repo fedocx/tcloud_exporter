@@ -34,6 +34,15 @@ func GetMongoMetrics(dataconfig *viper.Viper) []string {
 	return mongo
 }
 
+func GetMongoClusterMetrics(dataconfig *viper.Viper) []string {
+	mongo_cluster := dataconfig.GetStringSlice("mongodb_cluster")
+	return mongo_cluster
+}
+
+func GetMongoReplicationMetrics(dataconfig *viper.Viper) []string {
+	mongo_cluster := dataconfig.GetStringSlice("mongodb_replication")
+	return mongo_cluster
+}
 func GetRedisMetrics(dataconfig *viper.Viper) []string {
 	redis := dataconfig.GetStringSlice("redis")
 	return redis

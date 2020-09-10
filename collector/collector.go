@@ -34,6 +34,8 @@ func MetricsConsumer(metrics *metrics.MetricObj, dataconfig *viper.Viper,flush_m
 	object_gauge.Object = gauge_maps
 	MysqlRegister(metrics,dataconfig,object_gauge)
 	MongodbRegister(metrics,dataconfig,object_gauge)
+	MongodbClusterRegister(metrics,dataconfig,object_gauge)
+	MongodbReplicationRegister(metrics,dataconfig,object_gauge)
 	RedisRegister(metrics,dataconfig,object_gauge)
 	KafkaPartitionRegister(metrics,dataconfig,object_gauge)
 	KafkaTopicRegister(metrics,dataconfig,object_gauge)
@@ -64,6 +66,33 @@ func MysqlRegister(metriccollector *metrics.MetricObj,dataconfig *viper.Viper,ob
 		gauge_maps.Gauge[val] = Register("tcloud","database_mysql",val,"Number of blob storage operations wa=itingto be processed.")
 	}
 	object_gauge.Object["mysql"] = append(object_gauge.Object["mysql"],gauge_maps)
+}
+
+
+func MongodbClusterRegister(metriccollector *metrics.MetricObj,dataconfig *viper.Viper,object_gauge *Object_Gauge){
+	gauge_map := make(map[string]*prometheus.GaugeVec)
+	gauge_maps := new(Metric_Gauge)
+	gauge_maps.Gauge = gauge_map
+
+	mongodb_metrics := utils.GetMongoClusterMetrics(dataconfig)
+	for _,val := range mongodb_metrics{
+		gauge_maps.Gauge[val] = Register("tcloud","database_mongodb_cluster",val,"Number of blob storage operations wa=itingto be processed.")
+
+	}
+	object_gauge.Object["mongodb_cluster"] = append(object_gauge.Object["mongodb_cluster"],gauge_maps)
+}
+
+func MongodbReplicationRegister(metriccollector *metrics.MetricObj,dataconfig *viper.Viper,object_gauge *Object_Gauge){
+	gauge_map := make(map[string]*prometheus.GaugeVec)
+	gauge_maps := new(Metric_Gauge)
+	gauge_maps.Gauge = gauge_map
+
+	mongodb_metrics := utils.GetMongoReplicationMetrics(dataconfig)
+	for _,val := range mongodb_metrics{
+		gauge_maps.Gauge[val] = Register("tcloud","database_mongodb_replication",val,"Number of blob storage operations wa=itingto be processed.")
+
+	}
+	object_gauge.Object["mongodb_replication"] = append(object_gauge.Object["mongodb_replication"],gauge_maps)
 }
 
 func MongodbRegister(metriccollector *metrics.MetricObj,dataconfig *viper.Viper,object_gauge *Object_Gauge){

@@ -27,3 +27,26 @@ func (t *Mongodb) GetCode() string {
 func(t *Mongodb) GetMetrics(dataconfig *viper.Viper) []string{
 	return dataconfig.GetStringSlice("mongodb")
 }
+
+type Mongodb_cluster struct {
+}
+
+
+func (t *Mongodb_cluster) GetCode() string {
+	return "QCE/CMONGO"
+}
+
+func(t *Mongodb_cluster) GetMetrics(dataconfig *viper.Viper) []string{
+	return dataconfig.GetStringSlice("mongodb_cluster")
+}
+type Mongodb_replication struct {
+}
+
+
+func (t *Mongodb_replication) GetCode() string {
+	return "QCE/CMONGO"
+}
+
+func(t *Mongodb_replication) GetMetrics(dataconfig *viper.Viper) []string{
+	return dataconfig.GetStringSlice("mongodb_replication")
+}

@@ -107,7 +107,8 @@ func FormatMetrics(productname string,response *monitor.GetMonitorDataResponse, 
 	Metrics.Metrics = metrics
 
 	Metrics.Metrics[*response.Response.MetricName] = datas
-	log.Print("采集到数据:", metrics, ":",datas[0].Key,"   value:",datas[0].Value)
+	//log.Print("采集到数据:", metrics) //, ":",datas[0].Key,"   value:",datas[0].Value)
+	log.Print("采集到数据:", metrics , ":",datas[0].Key,"   value:",datas[0].Value)
 	MetricCollector.Products[productname] = append(MetricCollector.Products[productname],Metrics)
 }
 

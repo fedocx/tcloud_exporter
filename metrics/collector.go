@@ -34,6 +34,8 @@ type Config struct{
 	Mysql []map[string]string `mapstructure:"mysql"`
 	Redis []map[string]string `mapstructure:"redis"`
 	Mongodb []map[string]string `mapstructure:"mongodb"`
+	MongodbCluster []map[string]string `mapstructure:"mongodb_cluster"`
+	MongodbReplication []map[string]string `mapstructure:"mongodb_replication"`
 	KafkaTopic []map[string]string `mapstructure:"kafka_topic"`
 	KafkaPartition []map[string]string `mapstructure:"kafka_partition"`
 
@@ -69,6 +71,22 @@ func GetResourceList(resourceconfig *viper.Viper, dataconfig *viper.Viper, metri
 				for _, mongometric := range data {
 					code := tclouddb.GetCode()
 					mongodb_config := config.Mongodb
+					metric_chan <- MetricChannel{Apinamespace: code, MetricType: mongometric, InstanceName: tclouddb, Config: mongodb_config,Type: val}
+				}
+			case "mongodb_cluster":
+				tclouddb = new(Mongodb_cluster)
+				data := tclouddb.GetMetrics(dataconfig)
+				for _, mongometric := range data {
+					code := tclouddb.GetCode()
+					mongodb_config := config.MongodbCluster
+					metric_chan <- MetricChannel{Apinamespace: code, MetricType: mongometric, InstanceName: tclouddb, Config: mongodb_config,Type: val}
+				}
+			case "mongodb_replication":
+				tclouddb = new(Mongodb_replication)
+				data := tclouddb.GetMetrics(dataconfig)
+				for _, mongometric := range data {
+					code := tclouddb.GetCode()
+					mongodb_config := config.MongodbReplication
 					metric_chan <- MetricChannel{Apinamespace: code, MetricType: mongometric, InstanceName: tclouddb, Config: mongodb_config,Type: val}
 				}
 			case "redis":
