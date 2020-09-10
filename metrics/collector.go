@@ -62,7 +62,6 @@ func GetResourceList(resourceconfig *viper.Viper, dataconfig *viper.Viper, metri
 					code := tclouddb.GetCode()
 					mysql_config := config.Mysql
 					metric_chan <- MetricChannel{Apinamespace: code, MetricType: mysqlmetric, InstanceName: tclouddb, Config: mysql_config,Type: val}
-
 				}
 			case "mongodb":
 				tclouddb = new(Mongodb)
@@ -86,7 +85,6 @@ func GetResourceList(resourceconfig *viper.Viper, dataconfig *viper.Viper, metri
 				for _, mongometric := range data {
 					code := tclouddb.GetCode()
 					kafka_config := config.KafkaTopic
-					//metric_chan <- MetricChannel{Apinamespace: code, MetricType: mongometric, InstanceName: tclouddb, Config: kafka_config}
 					metric_chan <- MetricChannel{Apinamespace: code, MetricType: mongometric, InstanceName: tclouddb, Config: kafka_config,Type: val}
 				}
 			case "kafka_partition":

@@ -40,8 +40,6 @@ func MetricsConsumer(metrics *metrics.MetricObj, dataconfig *viper.Viper,flush_m
 
 	ReadMetrics(metrics,dataconfig,object_gauge, flush_metrics)
 
-	//}
-
 }
 
 // 定义监控指标，对于mysql采集哪些指标，并对这些指标进行注册。

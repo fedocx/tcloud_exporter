@@ -3,6 +3,19 @@
   mysql:
     - yourinstanceid1
     - yourinstanceid2
+mysql:
+  - InstanceId: cdb-aaaaa
+mongodb:
+  - target: cmgo-aaaaaa-node-primary
 redis:
-- instanceid: crs-28wgf3u
-  clusterid: crs-28wgf3u
+  - instanceid: crs-aaaaa
+    clusterid: crs-aaaaa
+kafka_topic:
+  - instanceId: ckafka-aaaaa
+    topicId: topic-aaaaa
+kafka_partition:
+  - consumerGroup: aab
+    instanceId: ckafka-aaaa
+    topicId: topic-aaaaa
+    topicName: province_resources_topic
+    partition: 0

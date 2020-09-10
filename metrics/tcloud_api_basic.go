@@ -46,11 +46,8 @@ func GetMetrics(client *monitor.Client, MetricCollector *MetricObj, value_temp M
 	apinamespace := value_temp.Apinamespace
 	metrictype := value_temp.MetricType
 	objecttype := value_temp.Type
-	//instancename := value_temp.InstanceName
 	config := value_temp.Config
 
-	// log
-	//log.Print("开始采集:", objecttype, "    ",metrictype )
 	// 创建并设置请求参数
 	request := monitor.NewGetMonitorDataRequest()
 	request.Namespace = common.StringPtr(apinamespace)
@@ -60,24 +57,14 @@ func GetMetrics(client *monitor.Client, MetricCollector *MetricObj, value_temp M
 	utils.SetTimeRange(request)
 	// instance 设置
 
-	// print request delete
-	//fmt.Println(apinamespace,metrictype,instancelist)
-
-	//AddInstance(request, instancelist)
 	AddInstance(request,config)
-	// 发起请求
-	response, err := client.GetMonitorData(request)
+	response, err := client.GetMonitorData(request) // 发起请求
 	// 异常处理
 	if _, ok := err.(*errors.TencentCloudSDKError); ok {
-		fmt.Println(*request.Namespace,*request.MetricName,*request.Instances[0].Dimensions[0])
 		fmt.Printf("An API error has returned : %s", err)
-		lock <- 1
-		return
+	}else{
+		FormatMetrics(objecttype,response, MetricCollector) // 从response中获取有用数据，并更新到MetricCollector
 	}
-	if err != nil {
-		panic(err)
-	}
-	FormatMetrics(objecttype,response, MetricCollector)
 	lock <- 1
 }
 
@@ -99,11 +86,11 @@ func GetCpf() *profile.ClientProfile {
 
 }
 
+// 对返回数据进行规范化，并把数据放到管道中
 func FormatMetrics(productname string,response *monitor.GetMonitorDataResponse, MetricCollector *MetricObj) {
-	//metrics := make(map[string]float64)
+
 	datas := make([]*Data, 0)
 	for _, i := range response.Response.DataPoints {
-
 		instanceid := *i.Dimensions[0].Value
 		var value float64
 		if len(i.Values) > 0 {
@@ -119,13 +106,9 @@ func FormatMetrics(productname string,response *monitor.GetMonitorDataResponse, 
 	Metrics := new(Product)
 	Metrics.Metrics = metrics
 
-
 	Metrics.Metrics[*response.Response.MetricName] = datas
 	log.Print("采集到数据:", metrics, ":",datas[0].Key,"   value:",datas[0].Value)
-	//productname = NamespaceToNameMap(productname)
 	MetricCollector.Products[productname] = append(MetricCollector.Products[productname],Metrics)
-	//MetricCollector.Products[productname].[*response.Response.MetricName] = datas
-	//fmt.Println(MetricCollector.Products)
 }
 
 func AddInstance(request *monitor.GetMonitorDataRequest, instancelist []map[string]string) {
